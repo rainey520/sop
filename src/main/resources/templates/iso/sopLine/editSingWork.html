@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-sopLine-add">
+        <div class="form-group">
+            <input type="hidden" id="isoId" th:value="${isoId}">
+            <label class="col-sm-3 control-label">车间：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="houseId" onchange="singWorkChange(this)" name="houseId" class="form-control">
+                    <option value="0">请选择</option>
+                    <option th:each="item : ${house}" th:text="${item.workshopName}" th:value="${item.id}"
+                            th:selected="${sopLineWork.lineId == item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单工位：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="swId" class="form-control" name="swId">
+                    <option value="0">请选择</option>
+                    <option th:each="item : ${swList}" th:text="${item.imCode}" th:value="${item.id}"
+                    th:selected="${sopLineWork.wId == item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品编码：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
+                    <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" th:each="pn:${sopLines}"
+                            selected  th:text="${pn.pnCode}" th:value="${pn.pnId}"></option>
+                    <option th:each="item : ${pns}" th:text="${item.productCode}" th:value="${item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">选择作业指导书：</label>
+            <div class="col-sm-8">
+                <select id="pageId" style="width: 100%" name="pageId" class="form-control">
+                    <option value="0">请选择</option>
+                    <option th:if="${not #lists.isEmpty(pages)}" th:each="item:${pages}"
+                            th:value="${item.isoId}" th:utext="${item.cName}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    $(function () {
+        $("#houseId").select2({
+            placeholder: '请选择',
+            width: '100%'
+        });
+        $("#pnId").select2({
+            placeholder: '请选择',
+            width: '100%'
+        });
+        $("#swId").select2({
+            placeholder: '请选择',
+            width: '100%'
+        });
+        $("#pageId").select2({
+            placeholder: '请选择',
+            width: '100%'
+        });
+        $('select').select2();
+        var workConfig =[[${sopLineWork}]];
+        if (workConfig != null) {
+            $("#pageId").val(workConfig.pageId).trigger('change');
+        }
+    });
+    var prefix = ctx + "iso/sopLine";
+
+    /**
+     * 保存配置
+     */
+    function submitHandler() {
+        //先验车间
+        var houseId = $("#houseId").find("option:selected").val();
+        if (houseId <= 0) {
+            $.modal.alertWarning("请选择车间");
+            return;
+        }
+        //验证单工位
+        var swId = $("#swId").find("option:selected").val();
+        if (swId <= 0) {
+            $.modal.alertWarning("请选择单工位信息");
+            return;
+        }
+        // 验证产品
+        var pnSelect = $("#pnId").find("option:selected");
+        if ($(pnSelect).size() <= 0) {
+            $.modal.alertWarning("请选择产品编码");
+            return;
+        }
+        var pageId = $("#pageId").find("option:selected").val();
+        if (pageId <= 0) {
+            $.modal.alertWarning("请选择指导书页");
+            return;
+        }
+        var pns = [];
+        for (var i = 0; i < $(pnSelect).size(); i++) {
+            pns.push($(pnSelect[i]).val())
+        }
+        // 单工位信息
+        var sopLineWorks = [];
+        var work = {
+            lineId: houseId,
+            sopId: [[${isoId}]],
+            sopTag: 1,
+            wId: swId,
+            pageId: pageId,
+        }
+        sopLineWorks.push(work);
+        var data = {
+            lineId: swId,
+            sopId: [[${isoId}]],
+            pns: pns,
+            sopTag: 1,
+            sopLineWorks: sopLineWorks
+        }
+        var config = {
+            url: prefix + "/edit",
+            type: "post",
+            dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                $.operate.successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+
+    /**
+     * 车间下拉选择
+     */
+    function singWorkChange(val) {
+        // 车间id
+        var parentId = $(val).find("option:selected").val();
+        if (parentId > 0) {
+            $("#swId option").remove();
+            $("#swId select").select2({
+                data: [{id: 0, text: '请选择'}]
+            });
+            //或者对应车间的所有还未配置过的对应iso的单工位信息,以及所有的产品信息
+            $.post("/production/singleWork/selectNotConfigSop", {parentId: parentId,sopId:[[${isoId}]]}, function (res) {
+                if (res.code == 0) {
+                    var rows = [{id: 0, text: '请选择'}];
+                    var item = res.data;
+                    for (var i = 0; i < item.length; i++) {
+                        var row = {
+                            id: item[i].id,
+                            text: item[i].imCode
+                        }
+                        rows.push(row);
+                    }
+                    $("#swId").select2({
+                        data: rows
+                    });
+                } else {
+                    $.modal.alertWarning("操作异常...")
+                }
+            })
+        } else {
+            var data = [{id: 0, text: '请选择'}];
+            $("#swId option").remove();
+            $("#swId").select2({
+                data: data
+            });
+        }
+    }
+
+</script>
+</body>
+</html>

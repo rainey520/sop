@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-activeCode-edit">
+            <input id="ids" name="ids" th:value="${ids}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-12 ">公司：</label>
+				<div class="col-sm-12">
+					<select id="companyId" name="companyId" class="form-control" th:with="company=${@devCompany.selectComType0Company()}">
+						<option th:each="item:${company}"  th:value="${item.companyId}" th:text="${item.comName}"></option>
+					</select>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "code/activeCode";
+		$("#form-activeCode-edit").validate({
+			rules:{
+				companyId:{
+					required:true,
+				},
+			},
+			messages:{
+				companyId:{
+					required:"请选择公司",
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-activeCode-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

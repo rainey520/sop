@@ -1,0 +1,44 @@
+TRUNCATE `tab_sop_line`;
+
+TRUNCATE tab_sop`;
+
+ALTER TABLE `tab_sop_line`
+ADD COLUMN `w_id` INT(11) NULL AFTER `sop_tag`,
+ADD COLUMN `page_id` INT NULL AFTER `w_id`,
+ADD COLUMN `cnf_name` VARCHAR(145) NULL AFTER `page_id`;
+
+
+
+CREATE TABLE `tab_sop` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) DEFAULT NULL COMMENT '公司id',
+  `cnf_name` varchar(245) DEFAULT NULL COMMENT '配置名称',
+  `line_id` int(11) DEFAULT NULL COMMENT '产线名称',
+  `sop_id` int(11) DEFAULT NULL COMMENT 'sop书id',
+  `p_id` varchar(845) DEFAULT NULL COMMENT '产品id ',
+  `p_code` text COMMENT '产品编码',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `company_name_uindex` (`company_id`,`cnf_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SOP配置主表';
+
+
+ALTER TABLE `tab_sop_line`
+DROP COLUMN `cnf_name`,
+ADD COLUMN `s_id` INT NULL COMMENT '主表id' AFTER `page_id`,
+CHANGE COLUMN `w_id` `w_id` INT(11) NULL DEFAULT NULL COMMENT '工位id' ,
+CHANGE COLUMN `page_id` `page_id` INT(11) NULL DEFAULT NULL COMMENT '页id' ,
+DROP INDEX `cnf_uindex` ,
+ADD UNIQUE INDEX `cnf_uindex` (`company_id` ASC, `line_id` ASC, `sop_id` ASC, `pn_id` ASC, `w_id` ASC, `page_id` ASC, `sop_tag` ASC, `s_id` ASC) VISIBLE;
+;
+show index from tab_sop_line
+
+
+
+
+ALTER TABLE `asop`.`dev_work_order`
+ADD COLUMN `res_sign` INT NULL DEFAULT -1 COMMENT 'ASOP更新反馈 -1、默认值 0、未更新完 1、全部更新' AFTER `pb_sign`;
+
+
+ALTER TABLE `asop`.`tab_workstation`
+ADD COLUMN `res_sign` VARCHAR(45) NULL DEFAULT '-1' COMMENT '对应工位ASOP 更新标记 -1、默认值 0、未更新 1、更新' AFTER `def_id`;

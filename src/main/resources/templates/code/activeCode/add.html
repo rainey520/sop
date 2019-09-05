@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-activeCode-add">
+			<div class="form-group">	
+				<label class="col-sm-12">生成激活码个数<span style="color: red">[默认100个]</span>：</label>
+				<div class="col-sm-12">
+					<input id="codeNumber" name="codeNumber" class="form-control" type="number" value="100">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "code/activeCode"
+		$("#form-activeCode-add").validate({
+			rules:{
+				codeNumber:{
+					required:true,
+				},
+			},
+			messages:{
+				codeNumber:{
+					required:"请填写需要生成激活码个数",
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	        	$.modal.confirm("确认需要生成激活码吗?",function (e) {
+					if(e){
+						$.operate.save(prefix + "/add", $('#form-activeCode-add').serialize());
+					}
+				})
+
+	        }
+	    }
+	</script>
+</body>
+</html>

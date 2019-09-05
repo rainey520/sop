@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								激活码：<input type="text" name="code"/>
+							</li>
+
+							<li>
+								IMEI号：<input type="text" name="imei"/>
+							</li>
+							<li>
+								公司：
+								<select id="companyId" style="width: 200px" name="companyId" th:with="company=${@devCompany.selectComType0Company()}">
+									<option value="">请选择</option>
+									<option th:each="item:${company}"  th:value="${item.companyId}" th:text="${item.comName}"></option>
+								</select>
+							</li>
+
+							<li>
+								分配：
+								<select id="disSign" style="width: 120px" name="disSign">
+									<option value="">请选择</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</li>
+							<li>
+								激活：
+								<select id="actSign" style="width: 120px" name="actSign">
+									<option value="">请选择</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>分配时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li class="select-time">
+								<label>激活时间： </label>
+								<input type="text" class="time-input" id="actDate" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="actDateEnd" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="createCode()" shiro:hasPermission="code:activeCode:add">
+					<i class="fa fa-plus"></i> 生成激活码
+				</a>
+				<a class="btn btn-primary btn-del btn-del disabled" onclick="codeConfig()" shiro:hasPermission="code:activeCode:edit">
+					<i class="fa fa-remove"></i> 分配激活码
+				</a>
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="code:activeCode:export">
+						<i class="fa fa-download"></i> 导出
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+		$(function () {
+			$("#companyId").select2({
+				width:"200px",
+			});
+		})
+        var editFlag = [[${@permission.hasPermi('code:activeCode:edit')}]];
+        var prefix = ctx + "code/activeCode";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "激活码",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : '',
+					visible: false
+				},
+				{
+					field : 'code', 
+					title : '激活码',
+					sortable: true,
+					formatter:function (value, row, index) {
+						if(row.actSign){
+							return '<span style="color: green">'+value+'</span>';
+						}
+						return value;
+					}
+				},
+				{
+					field : 'imei', 
+					title : 'IMEI',
+					sortable: true
+				},
+				{
+					field : 'companyId', 
+					title : '公司',
+					sortable: true,
+					formatter:function (value, row, index) {
+						if(row.comName){
+							return row.comName;
+						}
+						return "-";
+					}
+				},
+				{
+					field : 'disSign', 
+					title : '分配',
+					sortable: true,
+					formatter:function (value) {
+						if(value == 1){
+							return '<span style="color: green">是</span>';
+						}
+						return "否";
+					}
+				},
+					{
+						field : 'actSign',
+						title : '激活',
+						sortable: true,
+						formatter:function (value, row, index) {
+							if(value == 1){
+								return '<span style="color: green">是</span>';
+							}
+							return "否";
+						}
+					},
+				{
+					field : 'createDate', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'disDate', 
+					title : '分配时间',
+					sortable: true
+				},
+				{
+					field : 'actDate', 
+					title : '激活时间',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+						var actions = [];
+		            	if(row.disSign == 0){
+							actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="codeConfig(\'' + row.id + '\')"><i class="fa fa-edit"></i>分配</a> ');
+						}
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+
+        function createCode() {
+			$.modal.open("生产激活码",prefix+"/add",500,300)
+		}
+
+		function codeConfig(id) {
+			var url = "/404.html";
+			if ($.common.isNotEmpty(id)) {
+				url = $.table._option.updateUrl.replace("{id}", id);
+			} else {
+				var rows = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+				if (rows.length == 0) {
+					$.modal.alertWarning("请至少选择一条记录");
+					return;
+				}
+				url = $.table._option.updateUrl.replace("{id}", rows.join());
+			}
+			$.modal.open("分配激活码", url,500,300);
+		}
+    </script>
+</body>
+</html>

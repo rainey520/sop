@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.code.activeCode.mapper.ActiveCodeMapper">
+    
+    <resultMap type="ActiveCode" id="ActiveCodeResult">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="imei"    column="imei"    />
+        <result property="actSign"    column="act_sign"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="disSign"    column="dis_sign"    />
+        <result property="activeIp"    column="active_ip"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="disDate"    column="dis_date"    />
+        <result property="actDate"    column="act_date"    />
+    </resultMap>
+
+    <resultMap type="ActiveCode" id="ActiveCodeResult1">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="imei"    column="imei"    />
+        <result property="actSign"    column="act_sign"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="disSign"    column="dis_sign"    />
+        <result property="activeIp"    column="active_ip"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="disDate"    column="dis_date"    />
+        <result property="actDate"    column="act_date"    />
+        <association property="comName" column="company_id" select="selectCodeCompanyNameById">
+            <result property="comName" column="com_name"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectActiveCodeVo">
+        select id, code, imei, act_sign, company_id, dis_sign, active_ip, create_date, dis_date, act_date from tab_active_code
+    </sql>
+	
+    <select id="selectActiveCodeList" parameterType="ActiveCode" resultMap="ActiveCodeResult1">
+        <include refid="selectActiveCodeVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="code != null  and code != '' "> and  code like concat(#{code}, '%')</if>
+             <if test="imei != null  and imei != '' "> and imei like concat(#{imei}, '%')</if>
+             <if test="actSign != null and actSign >=0 "> and act_sign = #{actSign}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="disSign != null and disSign >= 0 "> and dis_sign = #{disSign}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(dis_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(dis_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+             <if test="actDate != null ">
+                 date_format(act_date,'%y%m%d') &gt;= date_format(#{actDate},'%y%m%d')
+             </if>
+            <if test="actDateEnd != null ">
+                date_format(act_date,'%y%m%d') &lt;= date_format(#{actDateEnd},'%y%m%d')
+            </if>
+         </where>
+    </select>
+    <!--查询公司名称-->
+    <select id="selectCodeCompanyNameById" resultType="java.lang.String">
+        SELECT com_name FROM dev_company where company_id = #{company_id};
+    </select>
+    
+    <select id="selectActiveCodeById" parameterType="Integer" resultMap="ActiveCodeResult">
+        <include refid="selectActiveCodeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertActiveCode" parameterType="ActiveCode" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_active_code
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="code != null  and code != ''  ">code,</if>
+			<if test="imei != null  and imei != ''  ">imei,</if>
+			<if test="actSign != null  ">act_sign,</if>
+			<if test="companyId != null  ">company_id,</if>
+			<if test="disSign != null  ">dis_sign,</if>
+			<if test="activeIp != null  and activeIp != ''  ">active_ip,</if>
+			<if test="createDate != null  ">create_date,</if>
+			<if test="disDate != null  ">dis_date,</if>
+			<if test="actDate != null  ">act_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="code != null  and code != ''  ">#{code},</if>
+			<if test="imei != null  and imei != ''  ">#{imei},</if>
+			<if test="actSign != null  ">#{actSign},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="disSign != null  ">#{disSign},</if>
+			<if test="activeIp != null  and activeIp != ''  ">#{activeIp},</if>
+			<if test="createDate != null  ">#{createDate},</if>
+			<if test="disDate != null  ">#{disDate},</if>
+			<if test="actDate != null  ">#{actDate},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateActiveCode" parameterType="ActiveCode">
+        update tab_active_code
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null  and code != ''  ">code = #{code},</if>
+            <if test="imei != null  and imei != ''  ">imei = #{imei},</if>
+            <if test="actSign != null  ">act_sign = #{actSign},</if>
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="disSign != null  ">dis_sign = #{disSign},</if>
+            <if test="activeIp != null  and activeIp != ''  ">active_ip = #{activeIp},</if>
+            <if test="createDate != null  ">create_date = #{createDate},</if>
+            <if test="disDate != null  ">dis_date = #{disDate},</if>
+            <if test="actDate != null  ">act_date = #{actDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!--根据激活码查询对应激活码是否存在-->
+    <select id="selectActiveCodeByCode" resultMap="ActiveCodeResult">
+      SELECT * FROM tab_active_code where `code`=#{code} limit 1;
+    </select>
+
+    <!--根据激活查询对应的激活码信息-->
+    <select id="selctActiveCodeByCode" resultMap="ActiveCodeResult">
+      SELECT * FROM tab_active_code where code =#{code} limit 1;
+    </select>
+
+    <!--根据IMEI 号查询对应的设备是否已经激活-->
+    <select id="selectActiveCodeByImei" resultMap="ActiveCodeResult">
+        SELECT * FROM tab_active_code where imei =#{imei} limit 1;
+    </select>
+</mapper>
