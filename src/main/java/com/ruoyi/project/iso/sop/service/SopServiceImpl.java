@@ -1,9 +1,12 @@
 package com.ruoyi.project.iso.sop.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.iso.mapper.IsoMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,9 @@ public class SopServiceImpl implements ISopService
 {
 	@Autowired
 	private SopMapper sopMapper;
+
+	@Autowired
+	private IsoMapper isoMapper;
 
 	/**
      * 查询SOP配置主信息
@@ -85,5 +91,30 @@ public class SopServiceImpl implements ISopService
 	{
 		return sopMapper.deleteSopByIds(Convert.toStrArray(ids));
 	}
-	
+
+	/**
+	 * 通过作业指导书id查询已配置列表
+	 * @param companyId 公司id
+	 * @param isoId 作业指导书id
+	 * @return 结果
+	 */
+	@Override
+	public List<Sop> selectSopListBySopId(Integer companyId, Integer isoId) {
+		return sopMapper.selectSopListBySopId(companyId,isoId);
+	}
+
+	/**
+	 * 查询配置过的作业指导书
+	 * @param sop 配置信息
+	 * @return 结果
+	 */
+	@Override
+	public List<Iso> selectCnfSop(Sop sop) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		sop.setCompanyId(user.getCompanyId());
+		return isoMapper.selectCnfSop(sop);
+	}
 }

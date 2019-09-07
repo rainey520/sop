@@ -1,6 +1,9 @@
 package com.ruoyi.project.production.workstation.service;
 
 import com.ruoyi.common.constant.DevConstants;
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
@@ -136,31 +139,6 @@ public class WorkstationServiceImpl implements IWorkstationService
 		}
 		//操作硬件
 		DevList devList =null;
-//		//计数器
-//		if(work.getDevId() != workstation.getDevId()){
-//			workstation.setDevCode(null);
-//			if(work.getDevId() >0){
-//				//将原来的硬件修改为未配置
-//				devList = devListMapper.selectDevListById(work.getDevId());
-//				if(devList != null){
-//					devList.setSign(0);
-//					devList.setDevType(null);
-//					devListMapper.updateDevSign(devList);
-//				}
-//			}
-//			if(workstation.getDevId() > 0){
-//				//将现在的硬件修改为已配置
-//				devList = devListMapper.selectDevListById(workstation.getDevId());
-//				if(devList != null){
-//					devList.setSign(1);
-//					devList.setDevType(DevConstants.DEV_TYPE_LINE);
-//					devListMapper.updateDevSign(devList);
-//					workstation.setDevCode(devList.getDeviceId());
-//				}
-//			}
-//		}else {
-//			workstation.setDevCode(work.getDevCode());
-//		}
 		//看板
 		if(work.getcId() != workstation.getcId()){
 			workstation.seteCode(null);
@@ -184,41 +162,62 @@ public class WorkstationServiceImpl implements IWorkstationService
 		}else{
 			workstation.setcCode(work.getcCode());
 		}
-		//MES
-//		if(work.geteId() != workstation.geteId()){
-//			workstation.seteCode(null);
-//			if(work.geteId() > 0){
-//				devList = devListMapper.selectDevListById(work.geteId());
-//				if(devList != null){
-//					devList.setSign(0);
-//					devList.setDevType(null);
-//					devListMapper.updateDevSign(devList);
-//				}
-//			}
-//			if(workstation.geteId() > 0){
-//				devList = devListMapper.selectDevListById(workstation.geteId());
-//				if(devList != null){
-//					devList.setSign(1);
-//					devList.setDevType(DevConstants.DEV_TYPE_LINE);
-//					devListMapper.updateDevSign(devList);
-//					workstation.seteCode(devList.getDeviceId());
-//				}
-//			}
-//		}else{
-//			workstation.seteCode(work.geteCode());
-//		}
-		//判断数据标识
-//		if(workstation.getSign() == 1){
-//			//将其他工位全部修改为不是唯一标识
-//			workstationMapper.editWorkstationSign(work.getLineId(),work.getCompanyId(),0);
-//		}else if(work.getSign() == 1 && workstation.getSign() == 0){
-//			//将第一个工位修改为数据唯一标识
-//			workstationMapper.editFirstWorkstionSign(work.getLineId(),work.getCompanyId());
-//		}
 		int row = workstationMapper.updateWorkstation(workstation);
 		//更新流水线手动或者自动
 		updateLineManual(work);
 		return row;
+	}
+
+	/**
+	 * app 端工位配置看板硬件
+	 * @param workstation 工位信息
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int appLineCnfStation(Workstation workstation) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    throw new BusinessException(UserConstants.NOT_LOGIN);
+		}
+		Workstation work = workstationMapper.selectWorkstationById(workstation.getId());
+		if (work == null) {
+		    throw new BusinessException("工位不存在或者被删除");
+		}
+		if (StringUtils.isNotEmpty(workstation.getcCode())) {
+		    throw new BusinessException("看板硬件不能为空");
+		}
+		// 查询扫码的硬件是否存在
+		DevList devList = devListMapper.selectDevListByComCode(user.getCompanyId(), workstation.getcCode());
+		if (devList == null) {
+			throw new BusinessException("硬件不存在或被删除");
+		}
+		if (devList.getSign().equals(DevConstants.DEV_SIGN_USED)) {
+			throw new BusinessException("该硬件已被配置过");
+		}
+		if (work.getcId() != 0) {
+			// 相同情况
+			if (workstation.getcCode().equals(work.getcCode())) {
+				work.setcId(devList.getId());
+			    work.setcCode(devList.getDeviceId());
+			    // 不同情况
+			} else {
+				// 还原之前硬件配置
+				devListMapper.updateDevSignAndType(user.getCompanyId(),work.getcId(),DevConstants.DEV_SIGN_NOT_USE,null);
+				// 新增配置
+				work.setcId(devList.getId());
+				work.setcCode(devList.getDeviceId());
+				devListMapper.updateDevSignAndType(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE);
+			}
+		} else {
+			// 新增配置
+			work.setcId(devList.getId());
+			work.setcCode(devList.getDeviceId());
+			// 修改硬件为配置过
+			devListMapper.updateDevSignAndType(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE);
+		}
+
+		return workstationMapper.updateWorkstation(work);
 	}
 
 	/**

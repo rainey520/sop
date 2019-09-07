@@ -5,6 +5,7 @@ import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作业指导书  产线 配置 服务层
@@ -104,4 +105,27 @@ public interface ISopLineService
 	 * @return 结果
 	 */
 	SopLineWork selectSopLineWorkInfo(int companyId, int lineId, int sopId, int wId, int sopTag);
+
+	/**
+	 * 通过页信息查询配置列表
+	 * @param companyId 公司id
+	 * @param pageId 页id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineListByPageId(Integer companyId, Integer pageId);
+
+	/**
+	 * app端查询配置过的产品信息
+	 * @param sopLine 配置信息
+	 * @return 结果
+	 */
+	List<SopLine>  selectCnfPro(SopLine sopLine);
+
+	/**
+	 * app查询配置明细
+	 * @param companyId 公司id
+	 * @param id sop主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineBySId(Integer companyId, Integer id);
 }

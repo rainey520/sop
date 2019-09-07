@@ -29,15 +29,6 @@
                                         th:value="${pro.productName}"></option>
                             </select>
                         </li>
-
-                        <!--<li>-->
-                            <!--创建者：-->
-                            <!--<select style="width: 200px" id="createBy" name="createBy" class="kuan"-->
-                                    <!--th:with="user=${@user.selectComAllUser()}">-->
-                                <!--<option value="">全部</option>-->
-                                <!--<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userName}"></option>-->
-                            <!--</select>-->
-                        <!--</li>-->
                         <li>
                             责任人：
                             <select style="width: 200px" id="deviceLiable" name="deviceLiable" class="kuan"
@@ -48,7 +39,6 @@
                         </li>
 
                         <li>
-                            <!--工单生产状态：<input type="text" name="workorderStatus" />-->
                             生产状态：
                             <select style="width: 200px" name="workorderStatus">
                                 <option value="">全部</option>
@@ -61,9 +51,6 @@
                         <li>
                             工单号：<input type="text" style="max-width: 200px" name="workorderNumber"/>
                         </li>
-                        <!--<li>-->
-                            <!--订单：<input type="text" style="max-width: 200px" name="orderCode"/>-->
-                        <!--</li>-->
                         <li class="select-time">
                             <label>计划开始时间： </label>
                             <input type="text" class="time-input" id="startTime" placeholder="开始时间"
@@ -172,9 +159,9 @@
                     sortable: true,
                     formatter: function (value, row, index) {
                         if (row.abolish == 1) {
-                            return '<a href="javascript:void(0)" onclick="showWorkOrderDetail(\'' + row.id + '\')"><span style="color: red;font-weight: bold">' + value + '</span></a>'
+                            return '<span style="color: red;font-weight: bold">' + value + '</span>'
                         }
-                        return '<a href="javascript:void(0)" onclick="showWorkOrderDetail(\'' + row.id + '\')"><span style="font-weight: bold;color:#1E0FBE">' + value + '</span></a>';
+                        return '<span style="font-weight: bold;color:#1E0FBE">' + value + '</span>';
                     }
                 },
 
@@ -333,7 +320,7 @@
         }
     }
     function configWork(id,name) {
-        createMenuItem("/production/workstation/work/"+id,name+" 工位配置");
+        createMenuItem("/production/workstation/work/"+id,name+"--ASOP更新状态");
     }
     /**
      * 提交工单确认工单

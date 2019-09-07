@@ -37,7 +37,7 @@
 							name="cId"
 							th:with="devList = ${@devList.selectDevNotConfig()}">
 						<option value="0">请选择</option>
-						<option th:each="item : ${devList}"  th:text="${item.deviceId+'-'+item.deviceName}"
+						<option th:each="item : ${devList}"  th:text="${item.deviceId}"
 								th:value="${item.id}"></option>
 					</select>
 				</div>

@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.list.service;
 
+import com.ruoyi.project.app.domain.Product;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -188,4 +189,11 @@ public interface IDevProductListService
 	 * @return 结果
 	 */
 	List<DevProductList> selectProAllBySign(Integer sign);
+
+	/**
+	 * app 查询产品信息
+	 * @param product 产品编码
+	 * @return 结果
+	 */
+    List<Product> appSearchProList(Product product);
 }

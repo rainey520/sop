@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.CollationElementIterator;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -84,11 +85,11 @@ public class SopLineServiceImpl implements ISopLineService {
         }
         if (sop.getPns() == null || sop.getPns().length <= 0 ||
                 sop.getSopLines() == null || sop.getSopLines().size() <= 0) {
-            throw new Exception("配置异常，请联系管理员");
+            throw new BusinessException("配置异常，请联系管理员");
         }
-        Sop s = sopMapper.selectSopByCnfName(user.getCompanyId(),sop.getCnfName());
-        if(s != null){
-            throw new Exception("配置名称已经存在");
+        Sop s = sopMapper.selectSopByCnfName(user.getCompanyId(), sop.getCnfName());
+        if (s != null) {
+            throw new BusinessException("配置名称已经存在");
         }
         //查询对应产品信息
         StringBuilder pCodes = new StringBuilder();
@@ -101,14 +102,14 @@ public class SopLineServiceImpl implements ISopLineService {
             pCodes.append(productList.getProductCode() + ",");
         }
         if (pCodes.toString().length() <= 0) {
-            throw new Exception("配置产品编码异常");
+            throw new BusinessException("配置产品编码异常");
         }
         sop.setpId(StringUtils.join(sop.getPns(), ","));
         sop.setpCode(pCodes.toString().substring(0, pCodes.lastIndexOf(",")));
         sop.setCompanyId(user.getCompanyId());
         sop.setCreateTime(new Date());
         sopMapper.insertSop(sop);
-        handleSopDetailConfig(sop,user);
+        handleSopDetailConfig(sop, user);
         return 1;
     }
 
@@ -127,11 +128,11 @@ public class SopLineServiceImpl implements ISopLineService {
         }
         if (sop.getPns() == null || sop.getPns().length <= 0 ||
                 sop.getSopLines() == null || sop.getSopLines().size() <= 0) {
-            throw new Exception("配置异常，请联系管理员");
+            throw new BusinessException("配置异常，请联系管理员");
         }
-        Sop s = sopMapper.selectSopByCnfName(user.getCompanyId(),sop.getCnfName());
-        if(s != null && s.getId() != sop.getId()){
-            throw new Exception("配置名称已经存在");
+        Sop s = sopMapper.selectSopByCnfName(user.getCompanyId(), sop.getCnfName());
+        if (s != null && s.getId() != sop.getId()) {
+            throw new BusinessException("配置名称已经存在");
         }
         //删除对应详情配置信息
         sopLineMapper.deleteSopLineBySid(sop.getId());
@@ -146,12 +147,12 @@ public class SopLineServiceImpl implements ISopLineService {
             pCodes.append(productList.getProductCode() + ",");
         }
         if (pCodes.toString().length() <= 0) {
-            throw new Exception("配置产品编码异常");
+            throw new BusinessException("配置产品编码异常");
         }
         sop.setpId(StringUtils.join(sop.getPns(), ","));
         sop.setpCode(pCodes.toString().substring(0, pCodes.lastIndexOf(",")));
         sopMapper.updateSop(sop);
-        handleSopDetailConfig(sop,user);
+        handleSopDetailConfig(sop, user);
         return 1;
     }
 
@@ -292,5 +293,43 @@ public class SopLineServiceImpl implements ISopLineService {
             sopLineWork.setcName(isoMapper.selectIsoById(sopLineWork.getPageId()).getcName());
         }
         return sopLineWork;
+    }
+
+    /**
+     * 通过页信息查询配置列表
+     *
+     * @param companyId 公司id
+     * @param pageId    页id
+     * @return 结果
+     */
+    @Override
+    public List<SopLine> selectSopLineListByPageId(Integer companyId, Integer pageId) {
+        return sopLineMapper.selectSopLineListByPageId(companyId, pageId);
+    }
+
+    /**
+     * 查询配置过的产品
+     * @param sopLine 配置信息
+     * @return 结果
+     */
+    @Override
+    public List<SopLine> selectCnfPro(SopLine sopLine) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        sopLine.setCompanyId(user.getCompanyId());
+        return sopLineMapper.selectCnfPro(sopLine);
+    }
+
+    /**
+     * app端查询sop配置明细
+     * @param companyId 公司id
+     * @param sId sop主表id
+     * @return 结果
+     */
+    @Override
+    public List<SopLine> selectSopLineBySId(Integer companyId, Integer sId) {
+        return sopLineMapper.selectSopLineBySId(companyId,sId);
     }
 }

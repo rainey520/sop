@@ -108,10 +108,10 @@ public interface DevListMapper
 	DevList selectDevListByCode(@Param("code")String code);
 
 	/**
-	 * 查询所以未配置
+	 * 查询公司所以未配置
 	 * @return
 	 */
-	List<DevList> selectDevNotConfig();
+	List<DevList> selectDevNotConfig(@Param("companyId") Integer companyId);
 
 	/**
 	 * 通过硬件id更新是否被配置标记状态
@@ -129,4 +129,12 @@ public interface DevListMapper
 	 * @return
 	 */
 	int countDevNum();
+
+	/**
+	 * 通过编码查询硬件信息
+	 * @param companyId 公司id
+	 * @param code  看板编码
+	 * @return 结果
+	 */
+	DevList selectDevListByComCode(@Param("companyId") Integer companyId, @Param("code") String code);
 }

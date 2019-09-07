@@ -1,7 +1,9 @@
 package com.ruoyi.project.iso.sop.service;
 
+import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.sop.domain.Sop;
 import java.util.List;
+import java.util.Map;
 
 /**
  * SOP配置主 服务层
@@ -50,5 +52,19 @@ public interface ISopService
      * @return 结果
      */
 	public int deleteSopByIds(String ids);
-	
+
+	/**
+	 * 通过作业指导书id查询配置信息
+	 * @param companyId 公司id
+	 * @param isoId 作业指导书id
+	 * @return 结果
+	 */
+    List<Sop> selectSopListBySopId(Integer companyId, Integer isoId);
+
+	/**
+	 * 查询配置过的sop作业指导书
+	 * @param sop 配置信息
+	 * @return 结果
+	 */
+	List<Iso> selectCnfSop(Sop sop);
 }

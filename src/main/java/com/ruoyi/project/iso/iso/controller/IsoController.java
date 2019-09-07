@@ -12,6 +12,7 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.iso.sop.service.ISopService;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.system.user.domain.User;
@@ -44,6 +45,9 @@ public class IsoController extends BaseController {
 
     @Autowired
     private ISopLineService sopLineService;
+
+    @Autowired
+    private ISopService sopService;
 
     @Autowired
     private IDevProductListService productListService;
@@ -144,14 +148,14 @@ public class IsoController extends BaseController {
     public AjaxResult remove(@PathVariable("isoId") Integer isoId,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         Iso iso = isoService.selectIsoById(isoId);
-        if (FileConstants.CATEGORY_SOP_FOLDER.equals(iso.getCategory())) { // sop文件夹判断是否配置了产线信息
-            if (sopLineService.selectSopLineListBySopId(user.getCompanyId(),isoId).size() > 0) {
-                return error(1, "存在产线配置,不允许删除");
+        if (FileConstants.ITYPE_FOLDER.equals(iso.getiType())) {
+            if (sopService.selectSopListBySopId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在ASOP配置,不允许删除");
             }
         }
-        if (FileConstants.CATEGORY_SOP_FILE.equals(iso.getCategory())) { // sop文件夹下的作业指导书
-            if (sopLineService.selectSopLineWorkListBySopId(user.getCompanyId(),isoId).size() > 0) {
-                return error(1, "存在工位配置,不允许删除");
+        if (FileConstants.ITYPE_FILE.equals(iso.getiType())) {
+            if (sopLineService.selectSopLineListByPageId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在ASOP配置,不允许删除");
             }
         }
         if (isoService.selectIsoByParentId(isoId).size() > 0) {
@@ -228,4 +232,5 @@ public class IsoController extends BaseController {
             return error("请求失败");
         }
     }
+
 }

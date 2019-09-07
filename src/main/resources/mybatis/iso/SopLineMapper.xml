@@ -170,8 +170,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from tab_sop_line where s_id = #{sid};
     </delete>
 
+    <!--通过产线id删除sop配置明细-->
+    <delete id="deleteSopLineByLineId">
+        delete from tab_sop_line where company_id = #{companyId} and line_id = #{lineId}
+    </delete>
+
     <!--根据公司id，产线id，产品id，工位id查询对应的配置信息-->
     <select id="selectSopByCidAndLineIdAndPidAndWid" resultMap="SopLineResult2">
       SELECT * FROM tab_sop_line where company_id = #{companyId} and  line_id = #{lineId} and pn_code = #{pcode} and w_id = #{wid} limit 1;
     </select>
+
+    <select id="selectSopLineListByPageId" parameterType="SopLine" resultMap="SopLineResult2">
+        SELECT * FROM tab_sop_line
+        <where>
+            <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
+            <if test="pageId != null and pageId > 0 "> and page_id = #{pageId}</if>
+        </where>
+    </select>
+
+    <!--查询配置过的产品信息-->
+    <select id="selectCnfPro" parameterType="SopLine" resultMap="SopLineResult2">
+        SELECT * FROM tab_sop_line where line_id = #{lineId} and company_id = #{companyId}
+         <if test="pnCode != null and pnCode != ''">
+             and pn_code like concat(#{pnCode}, '%')
+         </if>
+         group by pn_id
+    </select>
+
+
+    <resultMap type="SopLine" id="SopLineResult3">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="pnId"    column="pn_id"    />
+        <result property="pnCode"    column="pn_code"    />
+        <result property="cId"    column="c_id"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="sopTag"    column="sop_tag"    />
+        <result property="wId"    column="w_id"    />
+        <result property="pageId"    column="page_id"    />
+        <result property="sid"    column="s_id"    />
+        <association property="workName" column="w_id" select="selectWorkName">
+            <result property="workName" column="w_name"/>
+        </association>
+        <association property="pageName" column="page_id" select="selectPageName">
+            <result property="pageName" column="e_name"/>
+        </association>
+    </resultMap>
+    <!--查询SOP配置明细-->
+    <select id="selectSopLineBySId" resultMap="SopLineResult3">
+        select * from tab_sop_line where s_id = #{sId} and company_id = #{companyId} group by w_id
+    </select>
+    <!--查询工位名称-->
+    <select id="selectWorkName" resultType="java.lang.String">
+        SELECT w_name  FROM tab_workstation where id = #{wId} limit 1;
+    </select>
+    <!--查询作业指导书页名称-->
+    <select id="selectPageName" resultType="java.lang.String">
+        SELECT e_name FROM tab_iso where iso_id = #{pageId} limit 1;
+    </select>
+
 </mapper>

@@ -41,7 +41,7 @@
 						<option value="0">请选择</option>
 						<option th:if="${workstation.cId != null and workstation.cId != 0}"  th:text="${workstation.cCode}"
 								  th:value="${workstation.cId}"></option>
-						<option th:each="item : ${devList}"  th:text="${item.deviceId+'-'+item.deviceName}"
+						<option th:each="item : ${devList}"  th:text="${item.deviceId}"
 								th:value="${item.id}"></option>
 					</select>
 				</div>

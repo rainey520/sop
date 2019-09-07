@@ -8,6 +8,8 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.iso.sop.mapper.SopMapper;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -49,6 +51,12 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 
     @Autowired
     private DevListMapper devListMapper;
+
+    @Autowired
+    private SopMapper sopMapper;
+
+    @Autowired
+    private SopLineMapper sopLineMapper;
 
     /**
      * 查询生产线信息
@@ -176,6 +184,10 @@ public class ProductionLineServiceImpl implements IProductionLineService {
                 workstationMapper.deleteWorkstationById(workstation.getId());
             }
         }
+        // 删除相关SOP配置
+        sopMapper.deleteSopByLineId(sysUser.getCompanyId(),id);
+        sopLineMapper.deleteSopLineByLineId(sysUser.getCompanyId(),id);
+
         return productionLineMapper.deleteProductionLineById(id);
     }
 
@@ -334,11 +346,15 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      */
     @Override
     public List<ProductionLine> appSelectLineList(ProductionLine productionLine) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
         if (productionLine == null) {
-            return productionLineMapper.selectAllDef0(JwtUtil.getUser().getCompanyId());
+            return productionLineMapper.selectAllDef0(user.getCompanyId());
         } else {
+            productionLine.setCompanyId(user.getCompanyId());
             List<ProductionLine> productionLines = productionLineMapper.selectProductionLineList(productionLine);
-            User user = null;
             for (ProductionLine line : productionLines) {
                 user = userMapper.selectUserInfoById(line.getDeviceLiable() == null ? 0 : line.getDeviceLiable());
                 if (user != null) {

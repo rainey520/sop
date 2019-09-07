@@ -7,13 +7,12 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.app.domain.Product;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
-import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,14 +41,6 @@ import java.util.List;
 public class DevProductListServiceImpl implements IDevProductListService {
     @Autowired
     private DevProductListMapper devProductListMapper;
-
-    @Autowired
-    private DevCompanyMapper devCompanyMapper;
-
-
-    @Autowired
-    private EcnLogMapper ecnLogMapper;
-
 
     @Autowired
     private ImportConfigMapper configMapper;
@@ -76,16 +66,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Override
     public List<DevProductList> selectDevProductListList(DevProductList devProductList) {
         List<DevProductList> list = devProductListMapper.selectDevProductListList(devProductList);
-//        for (DevProductList productList : list) {
-//            if (productList.getCompanyId() == null) continue;
-//            DevCompany devCompany = devCompanyMapper.selectDevCompanyById(productList.getCompanyId());
-//            if (devCompany != null) productList.setComName(devCompany.getComName());
-////            // 查询产品是否上传过文件
-////            List<FileSourceInfo> sourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveId(productList.getCompanyId(), FileConstants.FILE_SAVETYPE_PRO, productList.getId());
-////            if (StringUtils.isNotEmpty(sourceInfos)) {
-////                productList.setFileFlag(FileConstants.FILE_SAVE_YES);
-////            }
-//        }
         return list;
     }
 
@@ -125,14 +105,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
             // 设置导入价格
             devProductList.setPrice(new BigDecimal(devProductList.getPriceImport()));
         }
-//        // 更新产品库存记录的产品信息
-//        ProductStock productStock = productStockMapper.selectProductStockByProId(devProductList.getId());
-//        if (!StringUtils.isNull(productStock)) {
-//            productStock.setProductCode(devProductList.getProductCode());
-//            productStock.setProductName(devProductList.getProductName());
-//            productStock.setProductModel(devProductList.getProductModel());
-//            productStockMapper.updateProductStock(productStock);
-//        }
         return devProductListMapper.updateDevProductList(devProductList);
     }
 
@@ -591,5 +563,15 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Override
     public List<DevProductList> selectProAllBySign(Integer sign) {
         return devProductListMapper.selectProAllBySign(sign);
+    }
+
+    @Override
+    public List<Product> appSearchProList(Product product) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        product.setCompanyId(user.getCompanyId());
+        return devProductListMapper.appSearchProList(product);
     }
 }

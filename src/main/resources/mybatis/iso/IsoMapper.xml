@@ -157,6 +157,16 @@
 
     <!--根据公司id和父id查询作业指导书-->
     <select id="selectAllIsoByPidAndCompanyId" resultMap="IsoResult">
-        SELECT * FROM asop.tab_iso where company_id = #{companId} and parent_id = 0;
+        SELECT * FROM tab_iso where company_id = #{companId} and parent_id = 0;
+    </select>
+
+    <!--查询配置过的书信息-->
+    <select id="selectCnfSop" parameterType="com.ruoyi.project.iso.sop.domain.Sop" resultMap="IsoResult">
+        SELECT b.* FROM tab_sop as a,tab_iso as b where a.sop_id = b.iso_id
+        and b.company_id = #{companyId}
+        <if test="sopName != null and sopName != ''">
+            AND c_name like concat(#{sopName}, '%')
+        </if>
+         group by b.iso_id
     </select>
 </mapper>

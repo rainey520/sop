@@ -73,7 +73,9 @@ public class DevProductListController extends BaseController {
     @PostMapping("/export")
     @ResponseBody
     public AjaxResult export(DevProductList devProductList) {
-        devProductList.setSign(0);//编辑为产品
+        //编辑为产品
+        devProductList.setSign(0);
+        devProductList.setCompanyId(JwtUtil.getUser().getCompanyId());
         List<DevProductList> list = devProductListService.selectDevProductListList(devProductList);
         ExcelUtil<DevProductList> util = new ExcelUtil<DevProductList>(DevProductList.class);
         return util.exportExcel(list, "产品编码");

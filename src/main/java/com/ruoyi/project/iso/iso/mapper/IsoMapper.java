@@ -1,6 +1,7 @@
 package com.ruoyi.project.iso.iso.mapper;
 
 import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.sop.domain.Sop;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -128,4 +129,11 @@ public interface IsoMapper {
      * @return
      */
     List<Iso> selectAllIsoByPidAndCompanyId(@Param("companId")int companyId,@Param("pid")int pid);
+
+    /**
+     * 查询配置过的书信息
+     * @param sop 配置信息
+     * @return 结果
+     */
+    List<Iso> selectCnfSop(Sop sop);
 }

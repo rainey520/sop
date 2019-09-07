@@ -262,4 +262,11 @@ public interface IDevWorkOrderService {
      * @return 结果
      */
     DevWorkOrder selectWorkMesOrderByWorkId(int workId);
+
+    /**
+     * app 端保存工单
+     * @param workOrder 工单信息
+     * @return 结果
+     */
+    int appSaveWorkOrder(DevWorkOrder workOrder) throws Exception;
 }

@@ -47,8 +47,26 @@ public class SopLine extends BaseEntity
 	private String lineName;//产线名称
 	private String sopName;//SOP名称
 	private Integer wId;//工位id
+	private String workName;//工位名称
 	private Integer pageId;//页Id
+	private String pageName;//页名称
 	private Integer sid;//主表id
+
+	public String getWorkName() {
+		return workName;
+	}
+
+	public void setWorkName(String workName) {
+		this.workName = workName;
+	}
+
+	public String getPageName() {
+		return pageName;
+	}
+
+	public void setPageName(String pageName) {
+		this.pageName = pageName;
+	}
 
 	public Integer getId() {
 		return id;

@@ -182,6 +182,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectDevListVo"/>
         <where>
             and def_id = 0  and sign = 0 and device_status = 1
+            <if test="companyId != null and companyId > 0"> and company_id = #{companyId}</if>
         </where>
     </select>
 
@@ -193,5 +194,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询硬件编码总数-->
     <select id="countDevNum" resultType="java.lang.Integer">
         SELECT count(*) FROM dev_list;
+    </select>
+
+    <!--通过硬件编号查询未被删除的硬件信息-->
+    <select id="selectDevListByComCode" resultMap="DevListResult1">
+         SELECT * FROM dev_list where device_id = #{code} and company_id = #{companyId} and def_id = 0 limit 1;
     </select>
 </mapper>

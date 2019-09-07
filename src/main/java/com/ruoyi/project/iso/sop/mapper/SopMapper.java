@@ -68,5 +68,21 @@ public interface SopMapper
      * @return 结果
      */
 	public int deleteSopByIds(String[] ids);
-	
+
+	/**
+	 * 通过产线id删除sop主表信息
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @return 结果
+	 */
+    int deleteSopByLineId(@Param("companyId") Integer companyId,@Param("lineId") Integer lineId);
+
+	/**
+	 * 通过作业指导书id查询配置列表
+	 * @param companyId 结果
+	 * @param sopId 作业指导书id
+	 * @return 结果
+	 */
+    List<Sop> selectSopListBySopId(@Param("companyId") Integer companyId, @Param("sopId") Integer sopId);
+
 }

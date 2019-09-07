@@ -43,6 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="cnfName != null  and cnfName != '' "> and cnf_name like concat(#{cnfName}, '%')</if>
              <if test="lineId != null and  lineId > 0"> and line_id = #{lineId}</if>
              <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
+             <if test="pCode != null  and pCode != '' "> and p_code like concat('%',#{pCode}, '%')</if>
          </where>
     </select>
     <!--查询产线名称-->
@@ -108,6 +109,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据公司id 配置名称查询对应的信息是否存在-->
     <select id="selectSopByCnfName" resultMap="SopResult">
         SELECT * FROM tab_sop where company_id= #{companyId} and  cnf_name=#{cnfName} limit 1;
+    </select>
+
+    <!--通过产线id删除sop主表信息-->
+    <delete id="deleteSopByLineId">
+        delete from tab_sop where company_id = #{companyId}
+        <if test="lineId != null">and line_id = #{lineId}</if>
+    </delete>
+
+    <!--查询sop配置列表-->
+    <select id="selectSopListBySopId" resultMap="SopResult">
+        <include refid="selectSopVo"/>
+        <where>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
+        </where>
     </select>
     
 </mapper>

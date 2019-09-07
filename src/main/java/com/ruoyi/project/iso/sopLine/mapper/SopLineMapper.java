@@ -103,4 +103,36 @@ public interface SopLineMapper
 	 * @return
 	 */
 	int deleteSopLineBySid(@Param("sid")int sid);
+
+	/**
+	 * 通过产线id删除sop配置明细
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @return 结果
+	 */
+    int deleteSopLineByLineId(@Param("companyId") Integer companyId,@Param("lineId") Integer lineId);
+
+	/**
+	 * 通过页信息查询配置列表
+	 *
+	 * @param companyId 公司id
+	 * @param pageId    页id
+	 * @return 结果
+	 */
+    List<SopLine> selectSopLineListByPageId(@Param("companyId") Integer companyId, @Param("pageId") Integer pageId);
+
+	/**
+	 * 查询配置过的产品列表
+	 * @param sopLine 配置信息
+	 * @return 结果
+	 */
+	List<SopLine> selectCnfPro(SopLine sopLine);
+
+	/**
+	 * 查询配置明细
+	 * @param companyId 公司id
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineBySId(@Param("companyId") Integer companyId, @Param("sId") Integer sId);
 }

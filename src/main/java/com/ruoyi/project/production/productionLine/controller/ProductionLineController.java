@@ -1,16 +1,22 @@
 package com.ruoyi.project.production.productionLine.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.iso.sop.domain.Sop;
+import com.ruoyi.project.iso.sop.service.ISopService;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -20,6 +26,7 @@ import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import com.ruoyi.project.system.menu.domain.Menu;
 import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.menu.service.IMenuService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -230,9 +237,6 @@ public class ProductionLineController extends BaseController {
     private IWorkstationService workstationService;
 
     @Autowired
-    private ISopLineService sopLineService;
-
-    @Autowired
     private IMenuService menuService;
 
     @Autowired
@@ -245,11 +249,15 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     public AjaxResult appSelectLineList(@RequestBody ProductionLine productionLine){
         try {
+            User user = JwtUtil.getUser();
+            if (user == null) {
+                return AjaxResult.error("未登录或者登录超时");
+            }
             if (productionLine != null) {
                 productionLine.appStartPage();
                 Map<String,Object> map = new HashMap<>(16);
-                if (productionLine.getmParentId() != null && productionLine.getUid() != null) {
-                    List<Menu> menuApiList = menuService.selectMenuListByParentIdAndUserId(productionLine.getUid(), productionLine.getmParentId());
+                if (productionLine.getmParentId() != null) {
+                    List<Menu> menuApiList = menuService.selectMenuListByParentIdAndUserId(user.getUserId().intValue(), productionLine.getmParentId());
                     map.put("menuList",menuApiList);
                 }
                 map.put("lineList",productionLineService.appSelectLineList(productionLine));
@@ -275,23 +283,8 @@ public class ProductionLineController extends BaseController {
     }
 
     /**
-     * app端流水线查询sop配置列表
-     */
-    @PostMapping("/appLineCfSopList")
-    @ResponseBody
-    public AjaxResult appSelectLintCfSopList(@RequestBody SopLine sopLine){
-        try {
-            return AjaxResult.success("请求成功",sopLineService.selectSopLineList(sopLine));
-        } catch (Exception e) {
-            return error("请求失败");
-        }
-    }
-
-
-    /**
      * 通过产线id查询在该产线的工单列表 -- 产线实况
-     * @param lineId 产线id
-     * @param wlSign 流水线传0 单工位传1
+     * lineId 产线id
      */
     @PostMapping("/appWorkInLine")
     @ResponseBody

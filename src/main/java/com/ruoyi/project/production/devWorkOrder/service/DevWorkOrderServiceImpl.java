@@ -223,6 +223,39 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         return 1;
     }
 
+
+    /**
+     * app端新增工单
+     *
+     * @param workOrder 工单信息
+     * @return 结果
+     */
+    @Override
+    public int appSaveWorkOrder(DevWorkOrder workOrder) throws Exception{
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return 0;
+        }
+        // 验证产品是否存在
+        DevProductList product = productListMapper.selectDevProductByCode(user.getCompanyId(), workOrder.getProductCode());
+        if (product == null) {
+            throw new BusinessException("产品不存在或被删除");
+        }
+        // 制作类型
+        workOrder.setMakeType(product.getSign());
+        // 设置工单产品的名称
+        workOrder.setProductName(product.getProductName());
+        // 设置工单产品编码
+        workOrder.setProductCode(product.getProductCode());
+        //产品型号
+        workOrder.setProductModel(product.getProductModel());
+        // 设置工单属于哪个公司
+        workOrder.setCompanyId(user.getCompanyId());
+        // 创建者
+        workOrder.setCreateBy(user.getUserName());
+        return devWorkOrderMapper.insertDevWorkOrder(workOrder);
+    }
+
     /**
      * 修改工单
      *
@@ -1368,6 +1401,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     public List<DevWorkOrder> appSelectDevWorkOrderList(DevWorkOrder workOrder) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        workOrder.setCompanyId(user.getCompanyId());
         List<DevWorkOrder> workOrders = devWorkOrderMapper.selectDevWorkOrderList(workOrder);
         getLineOrHouseName(workOrders);
         return workOrders;

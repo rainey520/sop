@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.list.mapper;
 
+import com.ruoyi.project.app.domain.Product;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import org.apache.ibatis.annotations.Param;
 
@@ -236,4 +237,11 @@ public interface DevProductListMapper {
      * @return 结果
      */
     List<DevProductList> selectPartListByMesNotCof(@Param("ruleId") Integer ruleId);
+
+    /**
+     * app检索产品信息
+     * @param product 产品信息
+     * @return 结果
+     */
+    List<Product> appSearchProList(Product product);
 }

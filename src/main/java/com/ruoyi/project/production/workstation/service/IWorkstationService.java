@@ -57,5 +57,11 @@ public interface IWorkstationService
 	 * @return
 	 */
 	List<Workstation> selectAllByLineId(Integer lineId);
-	
+
+	/**
+	 * app端配置工位
+	 * @param workstation 工位信息
+	 * @return 结果
+	 */
+	int appLineCnfStation(Workstation workstation);
 }

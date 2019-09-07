@@ -641,8 +641,8 @@ public class DevWorkOrderController extends BaseController {
     @ResponseBody
     public AjaxResult appAddWork(@RequestBody DevWorkOrder workOrder){
         try {
-            workOrder.setProductionStart(DateUtils.dateTime("yyyy-MM-dd HH:ss:mm",workOrder.getEcnText()));
-            return toAjax(devWorkOrderService.insertDevWorkOrder(workOrder));
+            workOrder.setProductionStart(DateUtils.dateTime("yyyy-MM-dd",workOrder.getEcnText()));
+            return toAjax(devWorkOrderService.appSaveWorkOrder(workOrder));
         }catch (Exception e){
             e.printStackTrace();
             return  error(e.getMessage());

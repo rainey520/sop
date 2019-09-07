@@ -1,20 +1,13 @@
 package com.ruoyi.project.device.devList.service;
 
 import com.ruoyi.common.constant.DevConstants;
-import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.DevId;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.device.devIo.domain.DevIo;
-import com.ruoyi.project.device.devIo.mapper.DevIoMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
-import com.ruoyi.project.device.devModel.domain.DevModel;
-import com.ruoyi.project.device.devModel.mapper.DevModelMapper;
-import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
-import com.ruoyi.project.system.ser.domain.Ser;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -217,7 +210,11 @@ public class DevListServiceImpl implements IDevListService {
      */
     @Override
     public List<DevList> selectDevNotConfig() {
-        return devListMapper.selectDevNotConfig();
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return devListMapper.selectDevNotConfig(user.getCompanyId());
     }
 
     /**
