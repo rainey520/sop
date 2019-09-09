@@ -149,7 +149,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
         String code = cType ==0?"产品":"半成品";
         StringBuilder failMsg = new StringBuilder();
         StringBuilder successMsg = new StringBuilder();
-        ImportConfig config = configMapper.selectImportConfigByType(cType);//查询产品导入配置
+        ImportConfig config = configMapper.selectImportConfigByType(u.getCompanyId(),cType);//查询产品导入配置
         if(config == null){
             failMsg.insert(0,"很抱歉，导入失败，请先进行"+code+"导入信息配置");
             throw  new Exception(failMsg.toString());

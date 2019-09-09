@@ -3,6 +3,7 @@ package com.ruoyi.project.product.importConfig.service;
 
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
@@ -32,7 +33,11 @@ public class ImportConfigServiceImpl implements IImportConfigService
 	 */
 	@Override
 	public ImportConfig selectImportConfigByType(Integer cType) {
-		return importConfigMapper.selectImportConfigByType(cType);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return null;
+		}
+		return importConfigMapper.selectImportConfigByType(user.getCompanyId(),cType);
 	}
 
 	/**
@@ -43,9 +48,13 @@ public class ImportConfigServiceImpl implements IImportConfigService
 	@Override
 	@Transactional
 	public int insertImportConfig(ImportConfig importConfig) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return 0;
+		}
 		//删除之前产品导入的配置
-		importConfigMapper.deleteImportConfigByType(importConfig.getcType());
-		importConfig.setCompanyId(JwtUtil.getTokenUser(ServletUtils.getRequest()).getCompanyId());
+		importConfigMapper.deleteImportConfigByType(user.getCompanyId(),importConfig.getcType());
+		importConfig.setCompanyId(user.getCompanyId());
 		importConfig.setcTime(new Date());
 		return importConfigMapper.insertImportConfig(importConfig);
 	}
@@ -57,6 +66,10 @@ public class ImportConfigServiceImpl implements IImportConfigService
 	 */
 	@Override
 	public int deleteImportConfigByType(Integer cType) {
-		return importConfigMapper.deleteImportConfigByType(cType);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return 0;
+		}
+		return importConfigMapper.deleteImportConfigByType(user.getCompanyId(),cType);
 	}
 }

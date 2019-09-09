@@ -30,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectImportConfigByType" parameterType="Integer" resultMap="ImportConfigResult">
         <include refid="selectImportConfigVo"/>
-        where c_type = #{cType} limit 1
+        where c_type = #{cType} and company_id = #{companyId} limit 1
     </select>
         
     <insert id="insertImportConfig" parameterType="ImportConfig" useGeneratedKeys="true" keyProperty="id">
@@ -73,7 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	 
 
 	<delete id="deleteImportConfigByType" parameterType="Integer">
-        delete from tab_import_config where c_type = #{cType} limit 1
+        delete from tab_import_config where c_type = #{cType} and company_id = #{companyId} limit 1
     </delete>
 	
 

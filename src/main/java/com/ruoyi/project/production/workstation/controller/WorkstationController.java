@@ -143,7 +143,7 @@ public class WorkstationController extends BaseController
 	@PostMapping("/findByLineId")
 	@ResponseBody
 	public AjaxResult findByLineId(Integer lineId,Integer isoId){
-		Map map = new HashMap<String,Object>();
+		Map map = new HashMap<String,Object>(16);
 		map.put("proList", productListService.selectNotConfigByLineId2(lineId, JwtUtil.getUser().getCompanyId(), FileConstants.SOP_TAG_LINE));
 		map.put("work",workstationService.selectAllByLineId(lineId));
 		return AjaxResult.success(map);

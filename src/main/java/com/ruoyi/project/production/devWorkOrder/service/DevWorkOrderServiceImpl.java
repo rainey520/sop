@@ -1166,15 +1166,15 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     public Map<String, Object> ocrFile(MultipartFile file) throws Exception {
-        ImportConfig config = configMapper.selectImportConfigByType(3);
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if (company == null) throw new Exception("系统异常");
+        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(),3);
         if (config == null || StringUtils.isEmpty(config.getSecretKey()) ||
                 StringUtils.isEmpty(config.getAppId()) || StringUtils.isEmpty(config.getApiKey())) {
             throw new Exception("无APPKEY配置，请先初始化APPKEY配置");
         }
         Map<String, Object> map = new HashMap<>();
-        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
-        if (company == null) throw new Exception("系统异常");
         File f = new File(RuoYiConfig.getProfile() + "/" + company.getTotalIso());
         if ((f.exists() && !f.isDirectory()) || !f.exists()) {
             f.mkdir();
@@ -1262,9 +1262,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Transactional
     public int initOcrConfig() {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        ImportConfig config = configMapper.selectImportConfigByType(3);
+        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(),3);
         if (config != null) {
-            configMapper.deleteImportConfigByType(3);
+            configMapper.deleteImportConfigByType(user.getCompanyId(),3);
         }
         config = new ImportConfig();
         config.setcSign(0);
@@ -1286,7 +1286,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     public int saveInitOcrConfig(ImportConfig config) {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        ImportConfig config1 = configMapper.selectImportConfigByType(3);
+        ImportConfig config1 = configMapper.selectImportConfigByType(user.getCompanyId(),3);
         config.setAppId(appId);
         config.setApiKey(appKey);
         config.setSecretKey(secretKey);
@@ -1294,7 +1294,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             config.setAppId(config1.getAppId());
             config.setApiKey(config1.getApiKey());
             config.setSecretKey(config1.getSecretKey());
-            configMapper.deleteImportConfigByType(3);
+            configMapper.deleteImportConfigByType(user.getCompanyId(),3);
         }
         config.setcSign(1);
         config.setcType(3);
