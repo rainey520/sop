@@ -42,3 +42,9 @@ ADD COLUMN `res_sign` INT NULL DEFAULT -1 COMMENT 'ASOP更新反馈 -1、默认�
 
 ALTER TABLE `asop`.`tab_workstation`
 ADD COLUMN `res_sign` VARCHAR(45) NULL DEFAULT '-1' COMMENT '对应工位ASOP 更新标记 -1、默认值 0、未更新 1、更新' AFTER `def_id`;
+
+
+# 2019-09-10 添加文件大小
+ALTER TABLE `asop`.`tab_file_source_info`
+ADD COLUMN `f_size` BIGINT(20) NULL DEFAULT 0 COMMENT '文件大小' AFTER `create_time`;
+

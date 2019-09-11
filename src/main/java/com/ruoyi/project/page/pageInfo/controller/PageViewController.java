@@ -2,6 +2,8 @@ package com.ruoyi.project.page.pageInfo.controller;
 
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -9,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/c")
 public class PageViewController {
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PageViewController.class);
 
     private String prefix = "tem";
 
@@ -60,17 +64,7 @@ public class PageViewController {
     @ResponseBody
     @RequestMapping("/s/{code}")
     public Map<String,Object> apiGetSop(@PathVariable("code")String code){
-        Map<String,Object> map =new HashMap<>();
-        try {
-            map.put("code",1);
-            map.put("data",iIsoService.selectSopByDevCode(code).get("data"));
-            map.put("msg","请求成功");
-        }catch (Exception e){
-            map.put("code",0);
-            map.put("data",null);
-            map.put("msg",e.getMessage());
-        }
-        return map;
+        return iIsoService.selectSopByDevCode(code);
     }
 
 

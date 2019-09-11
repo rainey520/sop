@@ -23,16 +23,16 @@
                     <div class="ibox-title">
                         <h5>图片轮播</h5>
                     </div>
-                    <div class="ibox-content " th:if="${comPictures != null}">
+                    <div class="ibox-content " th:if="${picList != null}">
                         <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="10000">
                             <ol class="carousel-indicators">
-                                <li th:each="item,start:${comPictures}" data-target="#carousel-example-generic"
+                                <li th:each="item,start:${picList}" data-target="#carousel-example-generic"
                                     th:data-slide-to="${start.index}" th:class="${start.index ==0?'active':''}"></li>
                             </ol>
                             <div class="carousel-inner" role="listbox">
-                                <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${comPictures}">
+                                <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${picList}">
                                     <img alt="image" class="img-responsive" style="width: 100%;height: 360px"
-                                         th:src="${item}">
+                                         th:src="${item.filePath}">
                                 </div>
                             </div>
                             <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div>
-                        <li th:if="${comPictures == null}">
+                        <li th:if="${picList == null}">
                             <div class="ibox-content profile-content">
                                 <div class="user-button">
                                     <div class="row" style="text-align: center">
@@ -134,22 +134,6 @@
                            th:value="${user.email}">
                 </div>
             </div>
-            <div class="form-group" th:if="${user.loginName == user.createBy}">
-                <label class="col-sm-2 control-label">公司名称：</label>
-                <div class="col-sm-10">
-                    <input type="text" autocomplete="off" class="form-control"
-                           name="devCompany.comName" id="user.devCompany.comName"
-                           th:value="${user.devCompany.comName}">
-                </div>
-            </div>
-            <div class="form-group" th:if="${user.loginName == user.createBy}">
-                <label class="col-sm-2 control-label">公司地址：</label>
-                <div class="col-sm-10">
-                    <input type="text" autocomplete="off" class="form-control"
-                           name="devCompany.comAddress" id="user.devCompany.comAddress"
-                           th:value="${user.devCompany.comAddress}">
-                </div>
-            </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">性别：</label>
                 <div class="col-sm-10">
@@ -227,7 +211,7 @@
                 async: false,  //同步请求，
                 beforeSend: function () {
                     $.modal.loading("正在处理中，请稍后...");
-                    $.modal.disable();
+                    // $.modal.disable();
                 },
                 success: function (result) {
                     $.modal.closeLoading();
@@ -237,6 +221,8 @@
                         layer.close(index);
                     } else if (result.code == web_status.FAIL) {
                         $.modal.alert(result.msg);
+                    } else {
+                        $.modal.alert("操作失败");
                     }
                 }
             });

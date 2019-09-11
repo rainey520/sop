@@ -383,55 +383,89 @@ public class IsoServiceImpl implements IIsoService {
         Map<String, Object> map = new HashMap<>(16);
         DevList devList = devListMapper.selectDevListByCode(code);
         if (devList == null || devList.getCompanyId() == null) {
-            throw new BusinessException("硬件不存在或未归属公司");
+            map.put("code", 0);
+            map.put("msg", "硬件不存在或未归属公司");
+            return map;
         }
         if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
-            throw new BusinessException("硬件被禁用");
+            map.put("code", 0);
+            map.put("msg", "硬件被禁用");
+            return map;
         }
         if (devList.getDevType() == null || devList.getSign().equals(DevConstants.DEV_SIGN_NOT_USE)) {
-            throw new BusinessException("硬件未被配置");
+            map.put("code", 0);
+            map.put("msg", "硬件未被配置");
+            return map;
         }
         //查询对应公司信息
         DevCompany company = companyMapper.selectDevCompanyById(devList.getCompanyId());
         if (company == null) {
-            throw new BusinessException("公司信息不存在");
+            map.put("code", 0);
+            map.put("msg", "公司信息不存在");
+            return map;
         }
+        // 设置作业指导书看板相关信息
+        SopApi sopApi = new SopApi();
         //根据硬件编码查询对应的工位信息
-        Workstation workstation = workstationMapper.selectByDevCode(code);
-        if (workstation == null) throw new BusinessException("工位不存在");
+        Workstation workstation = workstationMapper.selectByDevCode(devList.getCompanyId(),code);
+        if (workstation == null) {
+            map.put("code", 0);
+            map.put("msg", "工位不存在");
+            return map;
+        }
         //查询对应产线
         ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
-        if (line == null) throw new BusinessException("产线不存在");
-        //查询正在进行的工单
-        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
-        if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode()))
-            throw new BusinessException("没有正在进行的工单");
-        //修改对应工位ASOP反馈标识
-        workstationMapper.updateAllResSignById(workstation.getId(), 1);
-        int num = workstationMapper.countAllResSignByCompanyIdAndLineId(workOrder.getCompanyId(),workOrder.getLineId());
-        if(num <= 0){
-            devWorkOrderMapper.updateWorkOrderResSign(workOrder.getId(),1);
-        }
-        //查询对应SOP配置
-        SopLine sopLine = sopLineMapper.selectSopByCidAndLineIdAndPidAndWid(workstation.getCompanyId(), line.getId(), workOrder.getProductCode(), workstation.getId());
-        if (sopLine == null) throw new BusinessException("没有配置SOP");
-        //查询对应SOP
-        Iso iso = isoMapper.selectIsoById(sopLine.getPageId());
-        if (iso == null) throw new BusinessException("工位没有配置SOP");
-        iso.setFileSize(line.getLineName() + " " + workstation.getwName());
-        iso.setcId(0);
-        // 设置作业指导书看板相关信息
-        SopApi sopApi = null;
-        try {
-            sopApi = getSopApi(map, workOrder, iso);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BusinessException("文件获取失败");
+        if (line == null) {
+            map.put("code", 0);
+            map.put("msg", "产线不存在");
+            return map;
         }
         sopApi.setlName(line.getLineName());
         sopApi.setwName(workstation.getwName());
         sopApi.setCompany(company.getComName());
+        //查询正在进行的工单
+        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
+        if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) {
+            map.put("code", 0);
+            map.put("msg", "没有正在进行的工单");
+            map.put("data", sopApi);
+            return map;
+        }
+
+        //修改对应工位ASOP反馈标识
+        workstationMapper.updateAllResSignById(workstation.getId(), 1);
+        int num = workstationMapper.countAllResSignByCompanyIdAndLineId(workOrder.getCompanyId(), workOrder.getLineId());
+        if (num <= 0) {
+            devWorkOrderMapper.updateWorkOrderResSign(workOrder.getId(), 1);
+        }
+        //查询对应SOP配置
+        SopLine sopLine = sopLineMapper.selectSopByCidAndLineIdAndPidAndWid(workstation.getCompanyId(), line.getId(), workOrder.getProductCode(), workstation.getId());
+        if (sopLine == null) {
+            map.put("code", 0);
+            map.put("msg", "没有配置SOP");
+            map.put("data", sopApi);
+            return map;
+        }
+        //查询对应SOP
+        Iso iso = isoMapper.selectIsoById(sopLine.getPageId());
+        if (iso == null) {
+            map.put("code", 0);
+            map.put("msg", "没有配置SOP");
+            map.put("data", sopApi);
+            return map;
+        }
+        iso.setFileSize(line.getLineName() + " " + workstation.getwName());
+        iso.setcId(0);
+        try {
+            sopApi = getSopApi(sopApi,map, workOrder, iso);
+        } catch (Exception e) {
+            map.put("code", 0);
+            map.put("msg", "请求失败");
+            return map;
+        }
         map.put("data", sopApi);
+        map.put("code", 1);
+        map.put("msg", "请求成功");
         return map;
 
     }
@@ -444,15 +478,13 @@ public class IsoServiceImpl implements IIsoService {
      * @param iso       sop
      * @return 结果
      */
-    private SopApi getSopApi(Map<String, Object> map, DevWorkOrder workOrder, Iso iso) throws UnsupportedEncodingException {
+    private SopApi getSopApi(SopApi sopApi,Map<String, Object> map, DevWorkOrder workOrder, Iso iso) throws UnsupportedEncodingException {
         int index = iso.getPath().lastIndexOf("/");
         String path = iso.getPath().substring(0, index);
         String fileName = iso.getPath().substring(index + 1);
         map.put("iso", iso);
-        SopApi sopApi = new SopApi();
         sopApi.setwCode(workOrder.getWorkorderNumber());
         sopApi.setwStatus(workOrder.getOperationStatus());
-//        sopApi.setwNumber(workOrder.getProductNumber());
         sopApi.setpCode(workOrder.getProductCode());
         sopApi.setpName(workOrder.getProductName());
         sopApi.setIsoId(iso.getIsoId());

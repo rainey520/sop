@@ -1,13 +1,18 @@
 package com.ruoyi.project.device.devCompany.controller;
 
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.system.user.domain.User;
@@ -20,17 +25,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.device.devCompany.domain.DevCompany;
-import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 公司 信息操作处理
@@ -127,6 +126,8 @@ public class DevCompanyController extends BaseController {
     @ResponseBody
     public AjaxResult editSave(DevCompany devCompany, HttpServletRequest request) {
         try {
+            devCompany.setSign(-1);
+            devCompany.setFileSize(-1);
             return toAjax(devCompanyService.updateDevCompany(devCompany, request));
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,16 +194,14 @@ public class DevCompanyController extends BaseController {
 
     /**
      * 跳转修改公司轮播图片
-     *
-     * @param mmap
-     * @return
      */
     @GetMapping("/comPicture")
-    public String comPicture(ModelMap mmap, HttpServletRequest request) {
-        User user = JwtUtil.getTokenUser(request);
-        DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
-        mmap.put("company", devCompany);
-        return prefix + "/comPicture";
+    public String comPicture(ModelMap map) {
+        map.put("saveType",0);
+        // User user = JwtUtil.getTokenUser(request);
+        // DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
+        // mmap.put("company", devCompany);
+        return prefix + "/comPicture1";
     }
 
     /**

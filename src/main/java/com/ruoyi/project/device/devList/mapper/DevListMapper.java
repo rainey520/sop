@@ -7,15 +7,15 @@ import java.util.List;
 
 /**
  * 硬件 数据层
- * 
+ *
  * @author ruoyi
  * @date 2019-04-08
  */
-public interface DevListMapper 
+public interface DevListMapper
 {
 	/**
      * 查询硬件信息
-     * 
+     *
      * @param id 硬件ID
      * @return 硬件信息
      */
@@ -27,26 +27,26 @@ public interface DevListMapper
 	 * @return
 	 */
 	DevList selectDevListByDevId(@Param("device_id") String device_id);
-	
+
 	/**
      * 查询硬件列表
-     * 
+     *
      * @param devList 硬件信息
      * @return 硬件集合
      */
 	public List<DevList> selectDevListList(DevList devList);
-	
+
 	/**
      * 新增硬件
-     * 
+     *
      * @param devList 硬件信息
      * @return 结果
      */
 	public int insertDevList(DevList devList);
-	
+
 	/**
      * 修改硬件
-     * 
+     *
      * @param devList 硬件信息
      * @return 结果
      */
@@ -65,18 +65,18 @@ public interface DevListMapper
 	 * @return
 	 */
 	int addSave(DevList devList);
-	
+
 	/**
      * 删除硬件
-     * 
+     *
      * @param id 硬件ID
      * @return 结果
      */
 	public int deleteDevListById(Integer id);
-	
+
 	/**
      * 批量删除硬件
-     * 
+     *
      * @param ids 需要删除的数据ID
      * @return 结果
      */
@@ -123,6 +123,21 @@ public interface DevListMapper
 	 */
 	int updateDevSignAndType(@Param("companyId") Integer companyId,@Param("id") Integer id,
 							 @Param("sign") int sign,@Param("devType") Integer devType);
+
+    /**
+     * 通过硬件id更新是否被配置标记状态
+     * @param companyId 公司id
+     * @param id 硬件id
+     * @param sign 是否被配置标记
+     * @param devType 硬件配置对象标记车间或者流水线
+     * @param deviceName 硬件名称
+     * @return 结果
+     */
+    int updateDevSignAndType1(@Param("companyId") Integer companyId,
+                              @Param("id") Integer id,
+                              @Param("sign") int sign,
+                              @Param("devType") Integer devType,
+                              @Param("deviceName")String deviceName);
 
 	/**
 	 * 查询硬件编码总数

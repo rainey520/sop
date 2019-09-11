@@ -1,6 +1,5 @@
 package com.ruoyi.project.system.user.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
@@ -9,6 +8,8 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.iso.filesource.domain.FileSourceInfo;
+import com.ruoyi.project.iso.filesource.service.IFileSourceInfoService;
 import com.ruoyi.project.system.menu.domain.Menu;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
@@ -41,6 +42,9 @@ public class IndexController extends BaseController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IFileSourceInfoService fileInfoService;
 
     @GetMapping("/s")
     public String s(ModelMap mmap,HttpServletRequest request){
@@ -75,10 +79,14 @@ public class IndexController extends BaseController {
         List<Menu> menus = menuService.selectMenusByUser(user);
         DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
         user.setDevCompany(devCompany);
-        if(devCompany != null && !StringUtils.isEmpty(devCompany.getComPicture())){
-            mmap.put("comPictures", JSON.parseArray(devCompany.getComPicture()));
-        }else {
-            mmap.put("comPictures", null);
+        if (devCompany != null) {
+            // 查询该公司的轮播图信息
+            List<FileSourceInfo> picList =  fileInfoService.selectFileByComPic(user.getCompanyId(),0);
+            if (StringUtils.isNotEmpty(picList)) {
+                mmap.put("picList",picList);
+            } else {
+                mmap.put("picList",null);
+            }
         }
         mmap.put("user",user);
         mmap.put("version", ruoYiConfig.getVersion());

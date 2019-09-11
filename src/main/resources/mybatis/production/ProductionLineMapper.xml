@@ -118,7 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceLiable != null  ">device_liable = #{deviceLiable},</if>
             <if test="deviceLiableTow != null  ">device_liable1 = #{deviceLiableTow},</if>
             <if test="manual != null  ">manual = #{manual},</if>
-            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            remark = #{remark},
             <if test="paramConfig != null    ">param_config = #{paramConfig},</if>
             <if test="sopId != null and sopId != '' ">sop_id = #{sopId},</if>
             <if test="productCodes != null and productCodes != '' ">product_codes = #{productCodes},</if>

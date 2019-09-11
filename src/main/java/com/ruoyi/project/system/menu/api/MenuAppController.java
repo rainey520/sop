@@ -1,9 +1,11 @@
 package com.ruoyi.project.system.menu.api;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.iso.filesource.service.IFileSourceInfoService;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.menu.service.IMenuService;
@@ -39,6 +41,9 @@ public class MenuAppController extends BaseController {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IFileSourceInfoService fileInfoService;
+
     /**
      * 一开始进入首页
      */
@@ -50,8 +55,10 @@ public class MenuAppController extends BaseController {
                 HashMap<String,Object> map = new HashMap<>(16);
                 // 查询菜单
                 map.put("menuList",menuService.selectMenuListByParentIdAndUserId(menuApi.getUid(),menuApi.getParentId()));
-                // 查询公司轮播图片
+                // 查询公司信息
                 map.put("company",companyService.appSelectComPicList(menuApi.getUid()));
+                // 轮播图片
+                map.put("comPicList",fileInfoService.selectFileByComPic(JwtUtil.getUser().getCompanyId(),0));
                 // 查询今日工单
                 map.put("workList",workOrderService.appSelectWorkListTwo());
                 // 用户头像

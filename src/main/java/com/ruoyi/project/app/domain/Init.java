@@ -10,8 +10,17 @@ public class Init {
     private List<DevWorkOrder> workList;
     private List<Menu> menuList;
     private DevCompany company;
+    private List<String> comPicList;
     //用户头像
     private String userPhoto;
+
+    public List<String> getComPicList() {
+        return comPicList;
+    }
+
+    public void setComPicList(List<String> comPicList) {
+        this.comPicList = comPicList;
+    }
 
     public List<DevWorkOrder> getWorkList() {
         return workList;

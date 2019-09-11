@@ -1,5 +1,6 @@
 package com.ruoyi.project.device.devList.controller;
 
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -225,8 +226,10 @@ public class DevListController extends BaseController
 		try {
 			devListService.createDevCode();
 			return success();
-		}catch (Exception e){
+		}catch (BusinessException e){
 			return error(e.getMessage());
+		}catch (Exception e){
+			return error("添加失败");
 		}
 	}
 

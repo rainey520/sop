@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -58,7 +59,11 @@ public class WorkstationServiceImpl implements IWorkstationService
 	@Override
 	public List<Workstation> selectWorkstationList(Workstation workstation)
 	{
-		workstation.setCompanyId(JwtUtil.getUser().getCompanyId());
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		workstation.setCompanyId(user.getCompanyId());
 	    return workstationMapper.selectWorkstationList(workstation);
 	}
 	
@@ -72,23 +77,18 @@ public class WorkstationServiceImpl implements IWorkstationService
 	@Transactional(rollbackFor = Exception.class)
 	public int insertWorkstation(Workstation workstation) throws Exception
 	{
-	    //查询计数器硬件
-        if(workstation.getDevId() != null && workstation.getDevId() > 0){
-            DevList devList = devListMapper.selectDevListById(workstation.getDevId());
-            if(devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0){
-                workstation.setDevCode(devList.getDeviceId());
-                devList.setSign(1);
-                devList.setDevType(DevConstants.DEV_TYPE_LINE);
-                devListMapper.updateDevSign(devList);
-            }else {
-                throw new Exception("计数器硬件编码配置错误");
-            }
-        }
+		// 查询产线名称
+		String lineName = "";
+		ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+		if (StringUtils.isNotNull(line)) {
+			lineName += line.getLineName() + "--";
+		}
         //查询看板器硬件
         if(workstation.getcId() != null && workstation.getcId() > 0){
             DevList devList = devListMapper.selectDevListById(workstation.getcId());
             if(devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0){
                 workstation.setcCode(devList.getDeviceId());
+                devList.setDeviceName(lineName + workstation.getwName());
 				devList.setSign(1);
 				devList.setDevType(DevConstants.DEV_TYPE_LINE);
 				devListMapper.updateDevSign(devList);
@@ -96,31 +96,8 @@ public class WorkstationServiceImpl implements IWorkstationService
                 throw new Exception("看板硬件编码配置错误");
             }
         }
-		//查询MES
-		if(workstation.geteId() != null && workstation.geteId() > 0){
-			DevList devList = devListMapper.selectDevListById(workstation.geteId());
-			if(devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0){
-				workstation.seteCode(devList.getDeviceId());
-				devList.setSign(1);
-				devList.setDevType(DevConstants.DEV_TYPE_LINE);
-				devListMapper.updateDevSign(devList);
-			}else {
-				throw new Exception("MES硬件编码配置错误");
-			}
-		}
-		//查询对应产线是否存在工位
-//        Workstation work = workstationMapper.selectWorkstationByLineId(workstation.getLineId(),workstation.getCompanyId());
-//        if(work ==null){
-//            workstation.setSign(1);
-//        }else if(work != null && workstation.getSign() == 1){
-//            //修改其他工位的数据标识
-//            workstationMapper.editWorkstationSign(workstation.getLineId(),workstation.getCompanyId(),0);
-//        }
         workstation.setcTime(new Date());
-        int row = workstationMapper.insertWorkstation(workstation);
-        //更新流水线手动或者自动
-		updateLineManual(workstation);
-		return row;
+        return workstationMapper.insertWorkstation(workstation);
 	}
 
 	/**
@@ -137,6 +114,15 @@ public class WorkstationServiceImpl implements IWorkstationService
 		if(work == null){
 			throw new Exception("工位被删除...");
 		}
+		String wName = "";
+		if (StringUtils.isNotEmpty(workstation.getwName())) {
+			wName = workstation.getwName();
+		}
+		String lineName = "";
+		ProductionLine line = productionLineMapper.selectProductionLineById(work.getLineId());
+		if (StringUtils.isNotNull(line)) {
+			lineName += line.getLineName() + "--";
+		}
 		//操作硬件
 		DevList devList =null;
 		//看板
@@ -146,6 +132,7 @@ public class WorkstationServiceImpl implements IWorkstationService
 				devList = devListMapper.selectDevListById(work.getcId());
 				if(devList != null){
 					devList.setSign(0);
+					devList.setDeviceName("");
 					devList.setDevType(null);
 					devListMapper.updateDevSign(devList);
 				}
@@ -154,18 +141,23 @@ public class WorkstationServiceImpl implements IWorkstationService
 				devList = devListMapper.selectDevListById(workstation.getcId());
 				if(devList != null){
 					devList.setSign(1);
+					devList.setDeviceName(lineName + wName);
 					devList.setDevType(DevConstants.DEV_TYPE_LINE);
 					devListMapper.updateDevSign(devList);
 					workstation.setcCode(devList.getDeviceId());
 				}
 			}
 		}else{
+			devList = devListMapper.selectDevListById(work.getcId());
+			if(devList != null){
+				devList.setSign(1);
+				devList.setDeviceName(lineName + wName);
+				devList.setDevType(DevConstants.DEV_TYPE_LINE);
+				devListMapper.updateDevSign(devList);
+			}
 			workstation.setcCode(work.getcCode());
 		}
-		int row = workstationMapper.updateWorkstation(workstation);
-		//更新流水线手动或者自动
-		updateLineManual(work);
-		return row;
+		return workstationMapper.updateWorkstation(workstation);
 	}
 
 	/**
@@ -184,7 +176,11 @@ public class WorkstationServiceImpl implements IWorkstationService
 		if (work == null) {
 		    throw new BusinessException("工位不存在或者被删除");
 		}
-		if (StringUtils.isNotEmpty(workstation.getcCode())) {
+		ProductionLine line = productionLineMapper.selectProductionLineById(work.getLineId());
+		if (StringUtils.isNull(line)) {
+		    throw new BusinessException("该工位关联的产线不存在或被删除");
+		}
+		if (StringUtils.isEmpty(workstation.getcCode())) {
 		    throw new BusinessException("看板硬件不能为空");
 		}
 		// 查询扫码的硬件是否存在
@@ -203,18 +199,18 @@ public class WorkstationServiceImpl implements IWorkstationService
 			    // 不同情况
 			} else {
 				// 还原之前硬件配置
-				devListMapper.updateDevSignAndType(user.getCompanyId(),work.getcId(),DevConstants.DEV_SIGN_NOT_USE,null);
+				devListMapper.updateDevSignAndType1(user.getCompanyId(),work.getcId(),DevConstants.DEV_SIGN_NOT_USE,null,"");
 				// 新增配置
 				work.setcId(devList.getId());
 				work.setcCode(devList.getDeviceId());
-				devListMapper.updateDevSignAndType(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE);
+				devListMapper.updateDevSignAndType1(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE,(line.getLineName() + "--" +work.getwName()));
 			}
 		} else {
 			// 新增配置
 			work.setcId(devList.getId());
 			work.setcCode(devList.getDeviceId());
 			// 修改硬件为配置过
-			devListMapper.updateDevSignAndType(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE);
+			devListMapper.updateDevSignAndType1(user.getCompanyId(),devList.getId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_LINE,(line.getLineName() + "--" +work.getwName()));
 		}
 
 		return workstationMapper.updateWorkstation(work);

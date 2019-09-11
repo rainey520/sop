@@ -1,7 +1,6 @@
 package com.ruoyi.project.system.user.controller;
 
 import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
@@ -13,7 +12,6 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.service.DictService;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.service.IUserService;
@@ -202,9 +200,8 @@ public class ProfileController extends BaseController {
                 return AjaxResult.success("success", user);
             }
             return error();
-        } catch (BusinessException e) {
-            return error(e.getMessage());
+        } catch (Exception e) {
+            return error("初始化失败");
         }
-
     }
 }

@@ -12,19 +12,19 @@
 					<input id="deviceName" name="deviceName" th:field="*{deviceName}" class="form-control" type="text">
 				</div>
 			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">状态：</label>
-				<div class="col-sm-8">
-					<div class="onoffswitch">
-						<input type="checkbox" th:checked="${devList.deviceStatus == 1 ? true : false}"
-							   class="onoffswitch-checkbox" id="deviceStatus" name="deviceStatus">
-						<label class="onoffswitch-label" for="deviceStatus">
-							<span class="onoffswitch-inner"></span>
-							<span class="onoffswitch-switch"></span>
-						</label>
-					</div>
-				</div>
-			</div>
+			<!--<div class="form-group">	-->
+				<!--<label class="col-sm-3 control-label">状态：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<div class="onoffswitch">-->
+						<!--<input type="checkbox" th:checked="${devList.deviceStatus == 1 ? true : false}"-->
+							   <!--class="onoffswitch-checkbox" id="deviceStatus" name="deviceStatus">-->
+						<!--<label class="onoffswitch-label" for="deviceStatus">-->
+							<!--<span class="onoffswitch-inner"></span>-->
+							<!--<span class="onoffswitch-switch"></span>-->
+						<!--</label>-->
+					<!--</div>-->
+				<!--</div>-->
+			<!--</div>-->
 			<div class="form-group">	
 				<label class="col-sm-3 control-label">备注信息：</label>
 				<div class="col-sm-8">
@@ -38,9 +38,9 @@
 		var prefix = ctx + "device/devList";
 		$("#form-devList-edit").validate({
 			rules:{
-				deviceName:{
-					required:true,
-				},
+				// deviceName:{
+				// 	required:true,
+				// },
 			}
 		});
 		
@@ -53,7 +53,7 @@
 			var id = $("input[name='id']").val();
 			var deviceName = $("input[name='deviceName']").val();
 			var remark = $("textarea[name='remark']").val();
-			var deviceStatus = $("input[name='deviceStatus']").is(':checked') == true ? 1 : 0;
+			// var deviceStatus = $("input[name='deviceStatus']").is(':checked') == true ? 1 : 0;
 			$.ajax({
 				cache : true,
 				type : "POST",
@@ -62,7 +62,7 @@
 					"id": id,
 					"deviceName": deviceName,
 					"remark": remark,
-					"deviceStatus": deviceStatus,
+					// "deviceStatus": deviceStatus,
 				},
 				async : false,
 				error : function(request) {

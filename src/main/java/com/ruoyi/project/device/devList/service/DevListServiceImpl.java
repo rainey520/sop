@@ -1,6 +1,7 @@
 package com.ruoyi.project.device.devList.service;
 
 import com.ruoyi.common.constant.DevConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.DevId;
@@ -87,7 +88,7 @@ public class DevListServiceImpl implements IDevListService {
      */
     @Override
     public int updateDevList(DevList devList, HttpServletRequest request) {
-            return devListMapper.updateDevList(devList);
+        return devListMapper.updateDevList(devList);
 
     }
 
@@ -99,7 +100,7 @@ public class DevListServiceImpl implements IDevListService {
      */
     @Override
     public int addSave(DevList devList, HttpServletRequest request) {
-            return devListMapper.insertDevList(devList);
+        return devListMapper.insertDevList(devList);
     }
 
     /**
@@ -109,7 +110,7 @@ public class DevListServiceImpl implements IDevListService {
      * @return 结果
      */
     @Override
-    public int deleteDevListByIds(String ids,HttpServletRequest request) {
+    public int deleteDevListByIds(String ids, HttpServletRequest request) {
         return 0;
     }
 
@@ -151,16 +152,17 @@ public class DevListServiceImpl implements IDevListService {
      */
     @Override
     public int deviceValidate(String code, HttpServletRequest request) {
-         return DevConstants.DEV_VALIDATE_TRUE;
+        return DevConstants.DEV_VALIDATE_TRUE;
     }
 
     /**
      * 成产硬件编码
+     *
      * @return
      * @throws Exception
      */
     @Override
-    public int createDevCode() throws Exception {
+    public int createDevCode(){
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         //查询硬件编码总数
 //        int num = devListMapper.countDevNum();
@@ -172,30 +174,46 @@ public class DevListServiceImpl implements IDevListService {
 //            throw new Exception("已经达到硬件编号最大数，需要升级才可以添加更多硬件编码");
 //        }
         DevList devList = null;
-        String devId =null;
-        for (int i =0;i<20;i++){
-             devId = "KB"+DevId.getPageCode();
-            if (StringUtils.isEmpty(devId)) {
-                continue;
-            }
-            devList = new DevList();
-            devList.setDeviceId(devId);
-            devList.setDeviceStatus(1);
-            devList.setDefId(0);
-            devList.setDeviceUploadTime(15);
-            devList.setDevModelId(1);
-            devList.setCreateDate(new Date());
-            devList.setCompanyId(user.getCompanyId());
-            DevList dev = devListMapper.selectDevListByDevId(devId);
-            if (dev == null) {
-                devListMapper.insertDevList(devList);
-            }
+        String devId = "KB" + DevId.getPageCode();
+        DevList dev = devListMapper.selectDevListByDevId(devId);
+        if (StringUtils.isNotNull(dev)) {
+            throw new BusinessException("添加失败，请重新添加");
         }
-        return 1;
+        // 添加硬件
+        devList = new DevList();
+        devList.setDeviceId(devId);
+        devList.setDeviceStatus(1);
+        devList.setDefId(0);
+        devList.setDeviceUploadTime(15);
+        devList.setDevModelId(1);
+        devList.setCreateDate(new Date());
+        devList.setCompanyId(user.getCompanyId());
+        return devListMapper.insertDevList(devList);
+
+        // for (int i =0;i<10;i++){
+        //      devId ="KB"+ DevId.getPageCode();
+        //     if (StringUtils.isEmpty(devId)) {
+        //         continue;
+        //     }
+        //     devList = new DevList();
+        //     devList.setDeviceId(devId);
+        //     devList.setDeviceStatus(1);
+        //     devList.setDefId(0);
+        //     devList.setDeviceUploadTime(15);
+        //     devList.setDevModelId(1);
+        //     devList.setCreateDate(new Date());
+        //     devList.setCompanyId(user.getCompanyId());
+        //     DevList dev = devListMapper.selectDevListByDevId(devId);
+        //     if (dev == null) {
+        //         devListMapper.insertDevList(devList);
+        //     }
+        // }
+        // return 1;
     }
 
     /**
      * 主服务器修改硬件信息
+     *
      * @param devList 硬件信息
      * @return 结果
      */
@@ -206,6 +224,7 @@ public class DevListServiceImpl implements IDevListService {
 
     /**
      * 查询所以未配置的硬件
+     *
      * @return
      */
     @Override
@@ -219,6 +238,7 @@ public class DevListServiceImpl implements IDevListService {
 
     /**
      * app端查询硬件信息
+     *
      * @param devList 硬件信息
      * @return 结果
      */

@@ -98,14 +98,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceId != null  and deviceId != ''  ">device_id = #{deviceId},</if>
             <if test="deviceStatus != null  ">device_status = #{deviceStatus},</if>
             <if test="configStatus != null  ">config_status = #{configStatus},</if>
-            <if test="deviceName != null  and deviceName != ''  ">device_name = #{deviceName},</if>
-            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            device_name = #{deviceName},
+            remark = #{remark},
             <if test="configDate != null  ">config_date = #{configDate},</if>
         </trim>
         where id = #{id}
     </update>
     <update id="updateDevSign" parameterType="DevList">
-        update dev_list set sign = #{sign},dev_type=#{devType} where id = #{id}
+        update dev_list set sign = #{sign},dev_type=#{devType},device_name = #{deviceName} where id = #{id}
     </update>
 
 	<update id="deleteDevListById" parameterType="Integer">
@@ -185,6 +185,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="companyId != null and companyId > 0"> and company_id = #{companyId}</if>
         </where>
     </select>
+
+    <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
+    <update id="updateDevSignAndType1">
+        update dev_list set sign = #{sign},dev_type = #{devType},device_name=#{deviceName} where id = #{id} and company_id = #{companyId}
+    </update>
 
     <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
     <update id="updateDevSignAndType">

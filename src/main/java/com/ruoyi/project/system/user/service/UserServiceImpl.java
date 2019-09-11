@@ -10,13 +10,10 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
-import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.project.iso.iso.domain.Iso;
-import com.ruoyi.project.iso.iso.mapper.IsoMapper;
 import com.ruoyi.project.system.config.service.IConfigService;
 import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
@@ -35,7 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户 业务层处理
@@ -542,15 +542,9 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public int changeLoginTag(User user, HttpServletRequest request) {
-        user.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 更新用户登录标记
-        DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
-        if (StringUtils.isNotNull(user.getDevCompany())) {
-            company.setComName(user.getDevCompany().getComName()); // 更新公司名称
-            company.setComAddress(user.getDevCompany().getComAddress()); // 更新公司地址
-            companyMapper.updateDevCompany(company);
-        }
+        // 更新用户登录标记
+        user.setLoginTag(UserConstants.LOGIN_TAG_ADD);
         return userMapper.updateUser(user);
-
     }
 
     /**

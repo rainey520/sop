@@ -18,18 +18,18 @@
 								硬件名称：<input type="text" name="deviceName"/>
 							</li>
 
+							<!--<li>-->
+								<!--状态：<select name="deviceStatus" style="width: 80px">-->
+								<!--<option value="-1">所有</option>-->
+								<!--<option  value="1">可用</option>-->
+								<!--<option  value="0">禁用</option>-->
+								<!--</select>-->
+							<!--</li>-->
 							<li>
-								状态：<select name="deviceStatus" style="width: 80px">
+								配置状态：<select name="sign" style="width: 80px">
 								<option value="-1">所有</option>
-								<option  value="1">可用</option>
-								<option  value="0">禁用</option>
-								</select>
-							</li>
-							<li>
-								是否配置：<select name="sign" style="width: 80px">
-								<option value="-1">所有</option>
-								<option  value="1">是</option>
-								<option  value="0">否</option>
+								<option  value="1">已配置</option>
+								<option  value="0">未配置</option>
 							</select>
 							</li>
 
@@ -49,9 +49,6 @@
 			</div>
 			
 	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-				<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="device:devList:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devList:export">
 						<i class="fa fa-download"></i> 导出
 				 </a>
@@ -80,9 +77,7 @@
 		        showExport: true,
 				sortName:'configDate',
 				sortOrder:'desc',
-                columns: [{
-		            checkbox: true
-		        },
+                columns: [
 				{
 					field : 'id', 
 					title : '',
@@ -96,23 +91,23 @@
 						return value;
 					}
 				},
-				{
-					field : 'deviceStatus', 
-					title : '可用状态',
-					sortable: true,
-					formatter:function (value,row,index) {
-						return statusTools(row);
-					}
-				},
+				// {
+				// 	field : 'deviceStatus',
+				// 	title : '可用状态',
+				// 	sortable: true,
+				// 	formatter:function (value,row,index) {
+				// 		return statusTools(row);
+				// 	}
+				// },
 					{
 						field : 'sign',
-						title : '是否配置',
+						title : '配置状态',
 						sortable: true,
 						formatter:function (value,row,index) {
 							if(value == 1){
-								return '<span style="color: green">是</span>'
+								return '<span style="color: green;font-weight: bold">已配置</span>'
 							}
-							return "否";
+							return '<span style="font-weight: bold;color: red">未配置</span>';
 						}
 					},
 				{

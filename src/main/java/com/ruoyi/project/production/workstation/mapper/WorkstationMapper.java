@@ -115,9 +115,9 @@ public interface WorkstationMapper
 	/**
 	 * 根据硬件编码查询对应的工位信息
 	 * @param code 硬件编码
-	 * @return
+	 * @return 结果
 	 */
-	Workstation selectByDevCode(@Param("code")String code);
+	Workstation selectByDevCode(@Param("companyId") Integer companyId,@Param("code")String code);
 
 	/**
 	 * 通过产线查询工位列表信息

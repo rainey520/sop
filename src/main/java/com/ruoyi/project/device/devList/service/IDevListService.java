@@ -90,7 +90,7 @@ public interface IDevListService
 	 * @return
 	 * @throws Exception
 	 */
-	int createDevCode() throws Exception;
+	int createDevCode();
 
 	/**
 	 * 主服务器修改硬件信息

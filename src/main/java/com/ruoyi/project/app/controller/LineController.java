@@ -12,13 +12,16 @@ import com.ruoyi.project.iso.sop.service.ISopService;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
-import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
-import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +35,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/app")
 public class LineController {
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(LineController.class);
 
     @Autowired
     private ILineService lineService;
@@ -193,9 +199,9 @@ public class LineController {
                 return rows > 0 ? AjaxResult.success() : AjaxResult.error();
             }
         } catch (BusinessException e) {
+            LOGGER.error("app工位配置看板硬件出现异常" + e.getMessage());
             return AjaxResult.error(e.getMessage());
         }
         return AjaxResult.error();
     }
-
 }

@@ -35,16 +35,16 @@
                     <h5 style="color: #0a0a0a">轮播图展示设置</h5>
                 </div>
                 <div>
-                    <div class="ibox-content" th:if="${comPictures != null}">
+                    <div class="ibox-content" th:if="${picList != null}">
                         <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="10000">
                             <ol class="carousel-indicators">
-                                <li th:each="item,start:${comPictures}" data-target="#carousel-example-generic"
+                                <li th:each="item,start:${picList}" data-target="#carousel-example-generic"
                                     th:data-slide-to="${start.index}" th:class="${start.index ==0?'active':''}"></li>
                             </ol>
                             <div class="carousel-inner" role="listbox">
-                                <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${comPictures}">
+                                <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${picList}">
                                     <img alt="image" class="img-responsive" style="width:100%;height: 350px;"
-                                         th:src="${item}">
+                                         th:src="${item.filePath}">
                                 </div>
                             </div>
                             <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
@@ -57,7 +57,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="ibox-content profile-content" th:if="${comPictures == null}">
+                    <div class="ibox-content profile-content" th:if="${picList == null}">
                         <div class="user-button">
                             <div class="row" style="text-align: center">
                                 <h3>未上传轮播图片</h3>
@@ -69,7 +69,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <button onclick="comPicture()" type="button" class="btn btn-w-m btn-primary btn-block">
-                                        上传轮播图片
+                                        管理轮播图片
                                     </button>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
      */
     function comPicture() {
         var url = prefix + '/comPicture';
-        $.modal.open("修改公司轮播图", url,700,500);
+        $.modal.open("修改公司轮播图", url);
     }
 
 

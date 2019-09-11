@@ -191,14 +191,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据产线id查询所以未配置的产品信息-->
     <select id="selectNotConfigByLineId" resultMap="DevProductListResult">
       SELECT p.id,p.product_code FROM dev_product_list as p
-      where p.company_id = #{companyid} and p.id not in
+      where p.company_id = #{companyid} and p.def_id = 0 and p.id not in
       (select distinct pn_id from tab_sop_line where line_id = #{lineId}
        and sop_tag = #{sopTag} and sop_id = #{isoId} and company_id = #{companyid})
     </select>
 
     <select id="selectNotConfigByLineId2" resultMap="DevProductListResult">
       SELECT p.id,p.product_code FROM dev_product_list as p
-      where p.company_id = #{companyid} and p.id not in
+      where p.company_id = #{companyid} and p.def_id = 0 and p.id not in
       (select distinct pn_id from tab_sop_line where line_id = #{lineId}
        and sop_tag = #{sopTag}  and company_id = #{companyid})
     </select>
@@ -210,7 +210,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询公司的所有产品信息-->
     <select id="selectProductAll" resultMap="DevProductListResult">
-        SELECT * FROM dev_product_list where company_id = #{companyId}
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0
     </select>
 
     <!--修改对应的产品MES规则-->
@@ -220,7 +220,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查看mes规格配置明细-->
     <select id="selectMesCfList" resultMap="DevProductListResult">
-        SELECT * FROM dev_product_list where company_id = #{companyId}
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0
         <if test="productCode != null  and productCode != ''  ">
             and product_code = #{productCode}
         </if>
@@ -237,12 +237,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过追踪规则id查询配置的产品信息-->
     <select id="selectDevProductByRuleId" resultMap="DevProductListResult">
-        SELECT * FROM dev_product_list where company_id = #{companyId} and rule_id = #{ruleId}
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0 and rule_id = #{ruleId}
     </select>
 
     <!--通过标记查询半成品或者成品-->
     <select id="selectProAllBySign" resultType="com.ruoyi.project.product.list.domain.DevProductList">
-        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign};
+        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign} and def_id = 0;
     </select>
 
     <!--查看MES规则未配置的半成品明细-->
@@ -262,10 +262,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--app端检索产品信息-->
     <select id="appSearchProList" parameterType="com.ruoyi.project.app.domain.Product" resultType="com.ruoyi.project.app.domain.Product">
         SELECT id as proId,product_code as productCode FROM dev_product_list
-        <where>
+        where def_id = 0
             <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
             <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
-        </where>
          limit 0,5;
     </select>
 </mapper>
