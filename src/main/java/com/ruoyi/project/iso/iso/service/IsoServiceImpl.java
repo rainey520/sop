@@ -506,6 +506,11 @@ public class IsoServiceImpl implements IIsoService {
      */
     @Override
     public List<Iso> appSelectList(Iso iso) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        iso.setCompanyId(user.getCompanyId());
         return isoMapper.selectIsoList(iso);
     }
 
