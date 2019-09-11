@@ -89,6 +89,11 @@ public class IndexController extends BaseController {
             }
         }
         mmap.put("user",user);
+        if (user != null && user.getLoginTag() != null) {
+            mmap.put("userTag",user.getLoginTag());
+        } else {
+            mmap.put("userTag",user.getLoginTag());
+        }
         mmap.put("version", ruoYiConfig.getVersion());
 
         return "main";
@@ -102,8 +107,8 @@ public class IndexController extends BaseController {
     @PostMapping("/checkUserLoginTag")
     @ResponseBody
     public AjaxResult checkUserLoginTag(HttpServletRequest request) {
-        User u = JwtUtil.getTokenCookie(request.getCookies());
-         u = userService.selectUserById(u.getUserId());
+        User u = JwtUtil.getUser();
+        u = userService.selectUserById(u.getUserId());
         if (u.getLoginTag().equals(UserConstants.LOGIN_TAG_ADD)) { // 说明用户已经设置过了
             return AjaxResult.success("success", "1");
         } else {

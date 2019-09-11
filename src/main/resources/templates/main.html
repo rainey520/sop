@@ -13,7 +13,7 @@
     <link href="../static/css/main/style.min862f.css" th:href="@{/css/main/style.min862f.css}" rel="stylesheet"/>
     <link href="../static/ruoyi/css/ry-ui.css" th:href="@{/ruoyi/css/ry-ui.css?v=3.2.0}" rel="stylesheet"/>
 </head>
-<body class="gray-bg" onload="init()">
+<body class="gray-bg">
 <!--首页展示-->
 <div>
     <div class="row dashboard-header">
@@ -158,76 +158,80 @@
 <!--<script th:src="@{/js/bootstrap.min.js}"></script>-->
 <script th:inline="javascript">
     var prefix = ctx + "device/devCompany";
-    function init() {
-        checkUserLoginTag();
-        /**
-         * 用户进入首页校验用户的登录标记
-         */
-        function checkUserLoginTag() {
-            $.ajax({
-                type: 'POST',
-                url: '/checkUserLoginTag',
-                dataType: 'json',
-                async:false,  //同步请求，
-                success: function (result) {
-                    if (result.msg == 'error') { // 用户未设置
-                        initSetting();
-                    }
-                }
-            });
-        }
 
-        function initSetting() {
-            layer.open({
-                type: 1,
-                area: ['800px', ($(window).height() - 200) + 'px'],
-                fix: false,
-                //不固定
-                maxmin: true,
-                shade: 0.3,
-                title: "请先完成个人初始化设置",
-                content: $("#setting-info"),
-                btn: ['确定', '关闭'],
-                // 弹层外区域关闭
-                shadeClose: true,
-                yes: function (index, layero) {
-                    changeLoginTag(index);
-                },
-                cancel: function (index) {
-                    return true;
-                }
-            });
+    var userTag = [[${userTag}]];
+    $(function () {
+        if (userTag == 1) {
+            initSetting();
         }
+    })
 
-        /**
-         * 引导初始化改变用户登录标记
-         */
-        function changeLoginTag(index) {
-            $.ajax({
-                type: 'POST',
-                url: ctx + "system/user/profile/changeLoginTag",
-                dataType: 'json',
-                data: $('#form-user-edit').serialize(),
-                async: false,  //同步请求，
-                beforeSend: function () {
-                    $.modal.loading("正在处理中，请稍后...");
-                    // $.modal.disable();
-                },
-                success: function (result) {
-                    $.modal.closeLoading();
-                    if (result.code == web_status.SUCCESS) {
-                        $.modal.alert("初始化成功");
-                        $("#user_name",parent.parent.document).html(result.data.userName);
-                        layer.close(index);
-                    } else if (result.code == web_status.FAIL) {
-                        $.modal.alert(result.msg);
-                    } else {
-                        $.modal.alert("操作失败");
-                    }
+    /**
+     * 用户进入首页校验用户的登录标记
+     */
+    function checkUserLoginTag() {
+        $.ajax({
+            type: 'POST',
+            url: ctx +'checkUserLoginTag',
+            dataType: 'json',
+            async:false,  //同步请求，
+            success: function (result) {
+                if (result.msg == 'error') { // 用户未设置
+                    initSetting();
                 }
-            });
-        }
+            }
+        });
+    }
 
+    function initSetting() {
+        layer.open({
+            type: 1,
+            area: ['800px', ($(window).height() - 200) + 'px'],
+            fix: false,
+            //不固定
+            maxmin: true,
+            shade: 0.3,
+            title: "请先完成个人初始化设置",
+            content: $("#setting-info"),
+            btn: ['确定', '关闭'],
+            // 弹层外区域关闭
+            shadeClose: true,
+            yes: function (index, layero) {
+                changeLoginTag(index);
+            },
+            cancel: function (index) {
+                return true;
+            }
+        });
+    }
+
+    /**
+     * 引导初始化改变用户登录标记
+     */
+    function changeLoginTag(index) {
+        $.ajax({
+            type: 'POST',
+            url: ctx + "system/user/profile/changeLoginTag",
+            dataType: 'json',
+            data: $('#form-user-edit').serialize(),
+            // async: false,  //同步请求，
+            // beforeSend: function () {
+            //     $.modal.loading("正在处理中，请稍后...");
+            //     // $.modal.disable();
+            // },
+            success: function (result) {
+                // $.modal.closeLoading();
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.alert("初始化成功");
+                    $("#user_name",parent.parent.document).html(result.data.userName);
+                    layer.close(index);
+                } else if (result.code == web_status.FAIL) {
+                    $.modal.alert(result.msg);
+                } else {
+                    $.modal.alert("操作失败");
+                }
+            }
+        });
     }
 
     /**
