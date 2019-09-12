@@ -1,18 +1,18 @@
 package com.ruoyi.project.code.activeCode.service;
 
-import java.util.*;
-
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.project.code.activeCode.domain.ActiveCode;
 import com.ruoyi.project.code.activeCode.domain.ApiActiveCode;
+import com.ruoyi.project.code.activeCode.mapper.ActiveCodeMapper;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.code.activeCode.mapper.ActiveCodeMapper;
-import com.ruoyi.project.code.activeCode.domain.ActiveCode;
-import com.ruoyi.project.code.activeCode.service.IActiveCodeService;
-import com.ruoyi.common.support.Convert;
+
+import java.util.*;
 
 /**
  * 激活码 服务层实现
@@ -28,6 +28,9 @@ public class ActiveCodeServiceImpl implements IActiveCodeService
 
 	@Autowired
 	private DevCompanyMapper devCompanyMapper;
+
+	@Autowired
+	private DevListMapper devListMapper;
 
 	/**
      * 查询激活码信息
@@ -126,18 +129,18 @@ public class ActiveCodeServiceImpl implements IActiveCodeService
 	 */
 	@Override
 	public Map<String, Object> activeCode(ApiActiveCode apiActiveCode) {
-		Map<String,Object> map = new HashMap<>();
-		if(apiActiveCode == null || StringUtils.isEmpty(apiActiveCode.getCode()) || StringUtils.isEmpty(apiActiveCode.getImei())){
+		Map<String,Object> map = new HashMap<>(16);
+		if(apiActiveCode == null || StringUtils.isEmpty(apiActiveCode.getCode())){
 			map.put("code",0);
 			map.put("msg","激活异常");
 			return map;
 		}
-		ActiveCode imeiCode = activeCodeMapper.selectActiveCodeByImei(apiActiveCode.getImei());
-		if(imeiCode != null){
-			map.put("code",1);
-			map.put("msg","设备已经激活");
-			return map;
-		}
+		// ActiveCode imeiCode = activeCodeMapper.selectActiveCodeByImei(apiActiveCode.getImei());
+		// if(imeiCode != null){
+		// 	map.put("code",1);
+		// 	map.put("msg","设备已经激活");
+		// 	return map;
+		// }
 		//查询对应的激活码
 		ActiveCode activeCode = activeCodeMapper.selectActiveCodeByCode(apiActiveCode.getCode());
 		if(activeCode == null){
@@ -157,6 +160,81 @@ public class ActiveCodeServiceImpl implements IActiveCodeService
 		activeCodeMapper.updateActiveCode(activeCode);
 		map.put("code",1);
 		map.put("msg","激活成功");
+		return map;
+	}
+
+	/**
+	 * 硬件和激活码绑定操作
+	 * @param activeCode 绑定信息
+	 * @return 结果
+	 */
+	@Override
+	public Map<String, Object> relationDevCode(ApiActiveCode activeCode) {
+		Map<String,Object> map = new HashMap<>(16);
+		if (activeCode == null || StringUtils.isEmpty(activeCode.getCode()) || StringUtils.isEmpty(activeCode.getWatchCode())) {
+			map.put("code",0);
+			map.put("msg","绑定异常");
+			return map;
+		}
+		ActiveCode uniqueActive = activeCodeMapper.selectActiveCodeByCode(activeCode.getCode());
+		if (uniqueActive == null) {
+			map.put("code",0);
+			map.put("msg","激活码不存在或者失效");
+			return map;
+		}
+		// 更新硬件绑定信息
+		uniqueActive.setImei(activeCode.getWatchCode());
+		activeCodeMapper.updateActiveCode(uniqueActive);
+		map.put("code",1);
+		map.put("msg","绑定成功");
+		return map;
+	}
+
+	/**
+	 * 通过看板编码查询关联的激活码信息
+	 * @param watchCode 看板硬件编码
+	 * @return 结果
+	 */
+	@Override
+	public ActiveCode selectActiveCodeByImei(String watchCode) {
+		return activeCodeMapper.selectActiveCodeByImei(watchCode);
+	}
+
+	/**
+	 * 更换激活码
+	 * @param activeCode 绑定信息
+	 * @return 结果
+	 */
+	@Override
+	public Map<String, Object> changeActiveCode(ApiActiveCode activeCode) {
+		Map<String,Object> map = new HashMap<>(16);
+		if (activeCode == null || StringUtils.isEmpty(activeCode.getWatchCode())) {
+			map.put("code",0);
+			map.put("msg","更新失败");
+			return map;
+		}
+		// 生产新的激活码
+		String createCode = UUID.randomUUID().toString().replaceAll("-","")+System.currentTimeMillis();
+		//查询对应的激活码是否存在
+		ActiveCode uniqueCode = activeCodeMapper.selectActiveCodeByCode(createCode);
+		if(uniqueCode != null){
+			map.put("code",0);
+			map.put("msg","更新失败,请重新点击更新");
+			return map;
+		}
+		ActiveCode activeCodeByImei = activeCodeMapper.selectActiveCodeByImei(activeCode.getWatchCode());
+		if (activeCodeByImei == null) {
+			map.put("code",0);
+			map.put("msg","无关联信息");
+			return map;
+		}
+		// 通过硬件编码重设激活码
+		activeCodeByImei.setActSign(0);
+		activeCodeByImei.setCode(createCode);
+		activeCodeMapper.updateActiveCode(activeCodeByImei);
+		map.put("code",1);
+		map.put("data",createCode);
+		map.put("msg","更新成功");
 		return map;
 	}
 }

@@ -5,6 +5,8 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.code.activeCode.domain.ActiveCode;
+import com.ruoyi.project.code.activeCode.mapper.ActiveCodeMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -38,6 +40,10 @@ public class WorkstationServiceImpl implements IWorkstationService
 	@Autowired
 	private ProductionLineMapper productionLineMapper;
 
+	@Autowired
+	private ActiveCodeMapper activeCodeMapper;
+
+
 	/**
      * 查询工位配置信息
      * 
@@ -66,8 +72,34 @@ public class WorkstationServiceImpl implements IWorkstationService
 		workstation.setCompanyId(user.getCompanyId());
 	    return workstationMapper.selectWorkstationList(workstation);
 	}
-	
-    /**
+
+	/**
+	 * app端查询工位列表
+	 * @param workstation 工位配置信息
+	 * @return 结果
+	 */
+	@Override
+	public List<Workstation> appSelectWorkstationList(Workstation workstation) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		workstation.setCompanyId(user.getCompanyId());
+		List<Workstation> workstationList = workstationMapper.selectWorkstationList(workstation);
+		ActiveCode activeCode = null;
+		for (Workstation work : workstationList) {
+			// 查询硬件关联的激活码
+			if (work.getcId() > 0) {
+				activeCode = activeCodeMapper.selectActiveCodeByImei(work.getcCode());
+				if (activeCode != null && StringUtils.isNotEmpty(activeCode.getCode())) {
+				    work.setActiveCode(activeCode.getCode());
+				}
+			}
+		}
+		return workstationList;
+	}
+
+	/**
      * 新增工位配置
      * 
      * @param workstation 工位配置信息

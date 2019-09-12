@@ -12,6 +12,9 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.code.activeCode.domain.ActiveCode;
+import com.ruoyi.project.code.activeCode.domain.ApiActiveCode;
+import com.ruoyi.project.code.activeCode.mapper.ActiveCodeMapper;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
@@ -72,6 +75,9 @@ public class IsoServiceImpl implements IIsoService {
 
     @Autowired
     private DevCompanyMapper devCompanyMapper;
+
+    @Autowired
+    private ActiveCodeMapper activeCodeMapper;
 
     @Value("${file.iso}")
     private String isoFileUrl;
@@ -150,17 +156,6 @@ public class IsoServiceImpl implements IIsoService {
     }
 
     /**
-     * 设置文件路径创建文件夹
-     *
-     * @param iso
-     * @param company
-     * @param isoParent
-     */
-    private void setFilePath(Iso iso, DevCompany company, Iso isoParent) {
-
-    }
-
-    /**
      * 修改文件管理
      *
      * @param iso 文件管理信息
@@ -177,7 +172,7 @@ public class IsoServiceImpl implements IIsoService {
         if (StringUtils.isNotNull(isoData)) {
             // 获取文件的类型
             Integer iType = iso.getiType();
-            if (FileConstants.ITYPE_FILE.equals(iType)) { // 为文件类型
+            if (FileConstants.ITYPE_FILE.equals(iType)) {
                 // 判断文件名是否重复
                 isoUnique = isoMapper.selectIsoByEName(isoData.getDiskPath(), iso.geteName());
                 if (StringUtils.isNotNull(isoUnique)) {
@@ -375,18 +370,36 @@ public class IsoServiceImpl implements IIsoService {
     /**
      * 根据硬件编码查询对应的作业指导书
      *
-     * @param code 硬件编码
-     * @return
+     * @param apiActiveCode 硬件编码
+     * @return 结果
      */
     @Override
-    public Map<String, Object> selectSopByDevCode(String code) {
+    public Map<String, Object> selectSopByDevCode(ApiActiveCode apiActiveCode) {
         Map<String, Object> map = new HashMap<>(16);
-        DevList devList = devListMapper.selectDevListByCode(code);
+        // 查询激活码是否存在
+        if (apiActiveCode == null || StringUtils.isEmpty(apiActiveCode.getCode()) || StringUtils.isEmpty(apiActiveCode.getWatchCode())) {
+            map.put("code", 0);
+            map.put("msg", "硬件或激活码不能为空");
+            return map;
+        }
+        ActiveCode uniqueActiveCode = activeCodeMapper.selctActiveCodeByCode(apiActiveCode.getCode());
+        if (uniqueActiveCode == null) {
+            map.put("code", 2);
+            map.put("msg", "无效激活码");
+            return map;
+        }
+
+        DevList devList = devListMapper.selectDevListByCode(apiActiveCode.getWatchCode());
         if (devList == null || devList.getCompanyId() == null) {
             map.put("code", 0);
             map.put("msg", "硬件不存在或未归属公司");
             return map;
         }
+
+        // 更新硬件绑定信息
+        uniqueActiveCode.setImei(apiActiveCode.getWatchCode());
+        activeCodeMapper.updateActiveCode(uniqueActiveCode);
+
         if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
             map.put("code", 0);
             map.put("msg", "硬件被禁用");
@@ -407,7 +420,7 @@ public class IsoServiceImpl implements IIsoService {
         // 设置作业指导书看板相关信息
         SopApi sopApi = new SopApi();
         //根据硬件编码查询对应的工位信息
-        Workstation workstation = workstationMapper.selectByDevCode(devList.getCompanyId(),code);
+        Workstation workstation = workstationMapper.selectByDevCode(devList.getCompanyId(),apiActiveCode.getWatchCode());
         if (workstation == null) {
             map.put("code", 0);
             map.put("msg", "工位不存在");

@@ -65,5 +65,12 @@ public interface ActiveCodeMapper
 	 * @return
 	 */
 	ActiveCode selctActiveCodeByCode(@Param("code")String code);
-	
+
+	/**
+	 * 通过激活码硬件编码查询激活码信息
+	 * @param code 硬件编码
+	 * @param activeCode 激活码
+	 * @return
+	 */
+	ActiveCode selectUniqueActiveCode(@Param("code") String code,@Param("activeCode") String activeCode);
 }

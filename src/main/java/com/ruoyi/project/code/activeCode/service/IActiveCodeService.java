@@ -53,5 +53,25 @@ public interface IActiveCodeService
 	 * @return
 	 */
 	Map<String,Object> activeCode(ApiActiveCode code);
-	
+
+	/**
+	 * 硬件和激活码绑定
+	 * @param code 绑定信息
+	 * @return 结果
+	 */
+	Map<String, Object> relationDevCode(ApiActiveCode code);
+
+	/**
+	 * 通过看板编码查询关联的激活码信息
+	 * @param watchCode 看板硬件编码
+	 * @return 结果
+	 */
+	ActiveCode selectActiveCodeByImei(String watchCode);
+
+	/**
+	 * 更换激活码
+	 * @param code 绑定信息
+	 * @return 结果
+	 */
+	Map<String, Object> changeActiveCode(ApiActiveCode code);
 }

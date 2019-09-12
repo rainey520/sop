@@ -126,4 +126,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectActiveCodeByImei" resultMap="ActiveCodeResult">
         SELECT * FROM tab_active_code where imei =#{imei} limit 1;
     </select>
+
+    <!--通过硬件编码和激活码查询激活码信息-->
+    <select id="selectUniqueActiveCode" resultMap="ActiveCodeResult">
+        SELECT * FROM tab_active_code where imei =#{code} and code = #{activeCode} limit 1;
+    </select>
 </mapper>

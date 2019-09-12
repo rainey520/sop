@@ -1,11 +1,22 @@
 package com.ruoyi.project.code.activeCode.domain;
 
+import java.io.Serializable;
+
 /**
  * 激活码激活类
  */
-public class ApiActiveCode {
+public class ApiActiveCode implements Serializable {
     private String code;
     private String imei;
+    private String watchCode;
+
+    public String getWatchCode() {
+        return watchCode;
+    }
+
+    public void setWatchCode(String watchCode) {
+        this.watchCode = watchCode;
+    }
 
     public String getCode() {
         return code;
@@ -28,6 +39,7 @@ public class ApiActiveCode {
         return "ApiActiveCode{" +
                 "code='" + code + '\'' +
                 ", imei='" + imei + '\'' +
+                ", watchCode='" + watchCode + '\'' +
                 '}';
     }
 }

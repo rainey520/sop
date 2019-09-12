@@ -1,8 +1,7 @@
 package com.ruoyi.project.production.workstation.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -45,8 +44,17 @@ public class Workstation extends BaseEntity
 	private Date cTime;
 	/** 标记是否需要删除 */
 	private Integer defId;
-
+	/** 工位对应的激活码信息 */
+	private String activeCode;
 	private Integer resSign;//ASOP 更新标识
+
+	public String getActiveCode() {
+		return activeCode;
+	}
+
+	public void setActiveCode(String activeCode) {
+		this.activeCode = activeCode;
+	}
 
 	public String getDevName() {
 		return devName;

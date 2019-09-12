@@ -5,6 +5,7 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.app.service.ILineService;
+import com.ruoyi.project.code.activeCode.service.IActiveCodeService;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.iso.sop.domain.Sop;
@@ -56,6 +57,10 @@ public class LineController {
 
     @Autowired
     private IIsoService isoService;
+
+    @Autowired
+    private IActiveCodeService activeCodeService;
+
 
     @RequestMapping("/line")
     public AjaxResult lineAll() {

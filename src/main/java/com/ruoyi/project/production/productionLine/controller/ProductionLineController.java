@@ -1,7 +1,6 @@
 package com.ruoyi.project.production.productionLine.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -11,12 +10,6 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.project.iso.iso.service.IIsoService;
-import com.ruoyi.project.iso.sop.domain.Sop;
-import com.ruoyi.project.iso.sop.service.ISopService;
-import com.ruoyi.project.iso.sopLine.domain.SopLine;
-import com.ruoyi.project.iso.sopLine.service.ISopLineService;
-import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -24,7 +17,6 @@ import com.ruoyi.project.production.productionLine.service.IProductionLineServic
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import com.ruoyi.project.system.menu.domain.Menu;
-import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -276,7 +268,7 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     public AjaxResult appSelectLineCfDevList(@RequestBody Workstation workstation){
         try {
-            return  AjaxResult.success("请求成功",workstationService.selectWorkstationList(workstation));
+            return  AjaxResult.success("请求成功",workstationService.appSelectWorkstationList(workstation));
         } catch (Exception e) {
             return error("请求失败");
         }

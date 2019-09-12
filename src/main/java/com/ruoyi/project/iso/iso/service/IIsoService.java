@@ -1,5 +1,6 @@
 package com.ruoyi.project.iso.iso.service;
 
+import com.ruoyi.project.code.activeCode.domain.ApiActiveCode;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,7 +94,7 @@ public interface IIsoService
 	 * @param code 硬件编码
 	 * @return
 	 */
-	Map<String,Object> selectSopByDevCode(String code);
+	Map<String,Object> selectSopByDevCode(ApiActiveCode activeCode);
 
 	/**
 	 * 通过单工位id查询所有配置sop的iso列表
