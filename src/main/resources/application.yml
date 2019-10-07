@@ -136,17 +136,17 @@ gen:
 
 page:
   url: http://47.106.177.50:88/t/
-#  url: http://172.16.30.55:88/t/
+#  url: http://172.16.30.134:88/t/
 
 img:
   url: http://47.106.177.50:88/profile/avatar/
-#  url: http://172.16.30.55:88/profile/avatar/
+#  url: http://172.16.30.55:134/profile/avatar/
 
 file:
   url: http://47.106.177.50:88/profile/upload/
   iso: http://47.106.177.50:88/profile/
-#  url: http://172.16.30.55:88/profile/upload/
-#  iso: http://172.16.30.55:88/profile/
+#  url: http://172.16.30.55:134/profile/upload/
+#  iso: http://172.16.30.55:134/profile/
 
 baidu:
   appId: 16721729

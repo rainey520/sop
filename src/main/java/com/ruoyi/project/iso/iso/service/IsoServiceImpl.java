@@ -395,9 +395,16 @@ public class IsoServiceImpl implements IIsoService {
             map.put("msg", "硬件不存在或未归属公司");
             return map;
         }
-
+        // 查询扫码硬件有没有绑定过
+        ActiveCode activeCodeByImei = activeCodeMapper.selectActiveCodeByImei(apiActiveCode.getWatchCode());
+        if (StringUtils.isNotNull(activeCodeByImei) && !apiActiveCode.getCode().equals(activeCodeByImei.getCode())) {
+            map.put("code", 0);
+            map.put("msg", "该硬件已被绑定");
+            return map;
+        }
         // 更新硬件绑定信息
         uniqueActiveCode.setImei(apiActiveCode.getWatchCode());
+        uniqueActiveCode.setActSign(1);
         activeCodeMapper.updateActiveCode(uniqueActiveCode);
 
         if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {

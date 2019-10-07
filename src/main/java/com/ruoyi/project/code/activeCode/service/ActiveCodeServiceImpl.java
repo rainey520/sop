@@ -153,7 +153,7 @@ public class ActiveCodeServiceImpl implements IActiveCodeService
 			map.put("msg","激活失败，激活码失效");
 			return map;
 		}
-		activeCode.setImei(apiActiveCode.getImei());
+		// activeCode.setImei(apiActiveCode.getImei());
 		activeCode.setActSign(1);
 		activeCode.setActDate(new Date());
 		activeCode.setActiveIp(ServletUtils.getRequest().getRemoteAddr());

@@ -10,121 +10,87 @@
 </head>
 <link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>
 <body class="white-bg">
-<div class="ibox-content">
-    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#line" data-toggle="tab" aria-expanded="true">流水线工单</a></li>
-                <!--<li><a href="#single" data-toggle="tab" aria-expanded="false">计件工单</a></li>-->
-                <!--<a class="btn-info btn-sm" href="javascript:void(0)" shiro:hasPermission="device:devWorkOrder:ocr"-->
-                   <!--onclick="showWorkOcr()" style="float: right"><i class="fa fa-eye"></i>工单OCR</a>-->
-            </ul>
-
-            <div class="tab-content">
-                <!--产线-->
-                <div class="tab-pane active" id="line">
-                    <form class="form-horizontal m" id="form-devWorkOrder-add">
-                        <div class="col-sm-1"></div>
-                        <div class="col-sm-10">
-                            <div class="col-sm-6">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">工单号(唯一)：</label>
-                                        <div class="col-sm-8">
-                                            <input id="workorderNumber" name="workorderNumber" class="form-control"
-                                                   type="text" th:value="${workorderNumber}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">产品：</label>
-                                        <div class="col-sm-8">
-                                            <select id="productCode" name="productCode"
-                                                    class="form-control"
-                                                    th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
-                                                <option value="">请选择</option>
-                                                <option th:each="pro : ${productList}"
-                                                        th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
-                                                        th:text="${pro.productName+ ' - ' +pro.productCode}"
-                                                        th:value="${pro.id}" th:data-name="${pro.productName}"></option>
-                                            </select>
-                                            <input type="hidden" id="ecn-status" value="0">
-                                            <input type="hidden" name="wlSign" value="0">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">计划生产开始时间：</label>
-                                        <div class="col-sm-8">
-                                            <input id="productionStart" name="productionStart"
-                                                   class="form-control layer-date">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">选择产线：</label>
-                                        <div class="col-sm-8">
-                                            <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId"
-                                                    class="form-control"
-                                                    th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
-                                                <option value="">请选择</option>
-                                                <option th:if="${line.defId == 0}" th:each="line : ${productionLine}"
-                                                        th:text="${line.lineName}"
-                                                        th:value="${line.Id}"></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">责任人1：</label>
-                                        <div class="col-sm-8">
-                                            <!--显示责任人名称-->
-                                            <input id="userName1" name="userName1" class="form-control" type="text"
-                                                   readonly="true">
-                                            <!--隐藏责任人id-->
-                                            <input id="deviceLiable" name="deviceLiable" type="hidden" value="">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">责任人2：</label>
-                                        <div class="col-sm-8">
-                                            <!--显示责任人名称-->
-                                            <input id="userName2" name="userName2" class="form-control" type="text"
-                                                   readonly="true">
-                                            <!--隐藏责任人id-->
-                                            <input id="deviceLiableTow" name="deviceLiableTow" type="hidden" value="">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-1"></div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <div style="text-align: center;margin-top: 20px;">
-                                    <button class="btn btn-primary" type="submit" id="btnSubmit">确认</button>
-                                    <button class="btn btn-warning" type="button" onclick="refreshLine()">清除</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-devWorkOrder-add">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">工单号：</label>
+                <div class="col-sm-8">
+                    <input id="workorderNumber" name="workorderNumber" class="form-control"
+                           type="text" th:value="${workorderNumber}">
                 </div>
             </div>
         </div>
-    </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">选择产线：</label>
+                <div class="col-sm-8">
+                    <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId"
+                            class="form-control"
+                            th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                        <option value="">请选择</option>
+                        <option th:if="${line.defId == 0}" th:each="line : ${productionLine}"
+                                th:text="${line.lineName}"
+                                th:value="${line.Id}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">责任人1：</label>
+                <div class="col-sm-8">
+                    <!--显示责任人名称-->
+                    <input id="userName1" name="userName1" class="form-control" type="text"
+                           readonly="true">
+                    <!--隐藏责任人id-->
+                    <input id="deviceLiable" name="deviceLiable" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">责任人2：</label>
+                <div class="col-sm-8">
+                    <!--显示责任人名称-->
+                    <input id="userName2" name="userName2" class="form-control" type="text"
+                           readonly="true">
+                    <!--隐藏责任人id-->
+                    <input id="deviceLiableTow" name="deviceLiableTow" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品：</label>
+                <div class="col-sm-8">
+                    <select id="productCode" name="productCode"
+                            class="form-control"
+                            th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                        <option value="">请选择</option>
+                        <option th:each="pro : ${productList}"
+                                th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
+                                th:text="${pro.productName+ ' - ' +pro.productCode}"
+                                th:value="${pro.id}" th:data-name="${pro.productName}"></option>
+                    </select>
+                    <input type="hidden" id="ecn-status" value="0">
+                    <input type="hidden" name="wlSign" value="0">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开始时间：</label>
+                <div class="col-sm-8">
+                    <input id="productionStart" name="productionStart"
+                           class="form-control layer-date">
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 <script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
 <div th:include="include::footer"></div>
-<!--<script th:src="@{/ajax/libs/layui/lay/modules/layer.js}"></script>-->
 <script type="text/javascript">
     //日期范围限制
     var start = {
@@ -140,11 +106,8 @@
     };
     laydate(start);
 
+    var prefix = ctx + "device/devWorkOrder";
 
-    var prefix = ctx + "device/devWorkOrder"
-    /**
-     * 产线工单
-     */
     $("#form-devWorkOrder-add").validate({
         rules: {
             productCode: {
@@ -187,32 +150,20 @@
                 required: "请选择产线",
             },
         },
-        onsubmit: true,
-        submitHandler: function (form) {
+    });
+
+    /**
+     * 新增工单
+     */
+    function submitHandler() {
+        if ($.validate.form()) {
             $.modal.confirm("工单号是否已经确认？", function (callBack) {
                 if (callBack) {
-                    $.ajax({
-                        type: 'POST',
-                        url: prefix + "/add",
-                        dataType: 'json',
-                        data: $('#form-devWorkOrder-add').serialize(),
-                        async: false,  //同步请求，
-                        error: function (request) {
-                            $.modal.alertError("系统错误");
-                        },
-                        success: function (result) {
-                            if (result.code == web_status.SUCCESS) {
-                                $.modal.alertSuccess("新增工单成功");
-                                refreshLine();
-                            } else {
-                                $.modal.alertError(result.msg);
-                            }
-                        }
-                    });
+                    $.operate.save(prefix + "/add", $('#form-devWorkOrder-add').serialize());
                 }
             });
         }
-    });
+    }
 
     /**
      * 点击产线查询产线责任人

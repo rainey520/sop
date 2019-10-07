@@ -71,6 +71,9 @@
         </div>
 
         <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="addWork()" shiro:hasPermission="device:devWorkOrder:add">
+                <i class="fa fa-plus"></i> 新增工单
+            </a>
             <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devWorkOrder:export">
                 <i class="fa fa-download"></i> 导出
             </a>
@@ -480,6 +483,15 @@
     function mesProduce(id,code) {
         var url = prefix + "/mesProduce?id=" + id;
         createMenuItem(url, code + "--MES生产");
+    }
+
+    /**
+     * 跳转到添加页面
+     */
+    function addWork() {
+        var url = prefix + "/add";
+        // createMenuItem(url, "新建工单");
+        $.modal.open("新建工单", url,800,500);
     }
 
 </script>
