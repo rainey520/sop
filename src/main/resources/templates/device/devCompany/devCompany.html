@@ -37,6 +37,9 @@
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devCompany:export">
 						<i class="fa fa-download"></i> 导出
 				 </a>
+				<a class="btn btn-warning" onclick="editSoftVersion()">
+					<i class="fa fa-download"></i> APP版本修改
+				</a>
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -168,6 +171,13 @@
 					})
 				}
 			})
+		}
+
+		/**
+		 * 修改app版本
+		 */
+		function editSoftVersion() {
+			$.modal.open("修改APP版本",prefix+"/editSoftVersion",400,300);
 		}
     </script>
 </body>

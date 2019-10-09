@@ -48,3 +48,12 @@ ADD COLUMN `res_sign` VARCHAR(45) NULL DEFAULT '-1' COMMENT '对应工位ASOP �
 ALTER TABLE `asop`.`tab_file_source_info`
 ADD COLUMN `f_size` BIGINT(20) NULL DEFAULT 0 COMMENT '文件大小' AFTER `create_time`;
 
+
+# 2019-10-09 新增app版本信息
+INSERT INTO `bzystandard`.`tab_soft_version` (`id`, `type`, `version`) VALUES ('1', 'android', '1.0');
+INSERT INTO `bzystandard`.`tab_soft_version` (`id`, `type`, `version`) VALUES ('2', 'ios', '1.0');
+ALTER TABLE `bzystandard`.`tab_soft_version`
+ADD COLUMN `tag` INT NULL COMMENT '类型(1、ASOP，2、生产看板，3、用户APP端)' AFTER `version`;
+
+
+

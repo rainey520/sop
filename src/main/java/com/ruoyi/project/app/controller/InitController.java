@@ -6,7 +6,9 @@ import com.ruoyi.framework.shiro.service.LoginService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.app.domain.Index;
+import com.ruoyi.project.app.domain.SoftVersion;
 import com.ruoyi.project.app.service.IInitService;
+import com.ruoyi.project.app.service.ISoftVersionService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authc.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class InitController extends BaseController {
 
     @Autowired
     private IInitService iInitService;
+
+    @Autowired
+    private ISoftVersionService softVersionService;
 
     @PostMapping("/login")
     public AjaxResult ajaxLogin(@RequestBody User user) {
@@ -73,5 +78,13 @@ public class InitController extends BaseController {
     @RequestMapping("/getWorkCode")
     public AjaxResult getWorkCode(){
         return AjaxResult.success(iInitService.getWorkCode());
+    }
+
+    /**
+     * 获取app版本
+     */
+    @RequestMapping("/version")
+    public AjaxResult getSoftVersion(@RequestBody SoftVersion softVersion){
+        return AjaxResult.success(softVersionService.selectSoftVersion(softVersion));
     }
 }
