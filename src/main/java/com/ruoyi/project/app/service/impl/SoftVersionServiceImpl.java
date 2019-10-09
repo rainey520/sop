@@ -28,4 +28,24 @@ public class SoftVersionServiceImpl implements ISoftVersionService {
     public List<SoftVersion> selectSoftVersion(SoftVersion softVersion) {
         return softVersionMapper.selectSoftVersion(softVersion);
     }
+
+    /**
+     * 通过id查询版本信息
+     * @param id id
+     * @return 结果
+     */
+    @Override
+    public SoftVersion selectSoftVersionById(Integer id) {
+        return softVersionMapper.selectSoftVersionById(id);
+    }
+
+    /**
+     * 修改保存app版本
+     * @param softVersion 版本信息
+     * @return 结果
+     */
+    @Override
+    public int updateVersion(SoftVersion softVersion) {
+        return softVersionMapper.updateVersion(softVersion);
+    }
 }

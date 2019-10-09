@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "device/devCompany";
+
+    $(function() {
+        var options = {
+            url: prefix + "/versionList",
+            modalName: "版本号",
+            search: false,
+            showExport: false,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            columns: [
+                {
+                    field : 'type',
+                    title : '软件类型',
+                    sortable: true
+                },
+                {
+                    field : 'version',
+                    title : '版本',
+                    sortable: true
+                },
+                {
+                    field : 'tag',
+                    title : '软件端',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        if (value == 1) {
+                            return '<span style="font-weight: bold;color: red">ASOP</span>';
+                        } else if (value == 2) {
+                            return '<span style="font-weight: bold;color: green">生产看板</span>';
+                        } else if (value == 3) {
+                            return '<span style="font-weight: bold;color: green">用户APP</span>';
+                        } else {
+                            return value;
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="editVersion(\'' + row.id + '\')"><i></i>修改版本</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 修改版本
+     * @param id
+     */
+    function editVersion(id) {
+        $.modal.open("修改APP版本",prefix+"/editVersion?id=" + id,400,300);
+    }
+
+    // 关闭窗口
+    function submitHandler() {
+        $.modal.close();
+    }
+
+</script>
+</body>
+</html>

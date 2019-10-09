@@ -11,6 +11,8 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.app.domain.SoftVersion;
+import com.ruoyi.project.app.service.ISoftVersionService;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.iso.iso.domain.Iso;
@@ -52,6 +54,9 @@ public class DevCompanyController extends BaseController {
 
     @Autowired
     private IDevCompanyService devCompanyService;
+
+    @Autowired
+    private ISoftVersionService softVersionService;
 
     @Autowired
     private IIsoService isoService;
@@ -265,4 +270,45 @@ public class DevCompanyController extends BaseController {
             return error(e.getMessage());
         }
     }
+
+
+    /**
+     * 查看APP版本
+     */
+    @GetMapping("/softVersion")
+    public String softVersion() {
+        return prefix + "/softVersion";
+    }
+
+    /**
+     * 查询app版本信息
+     */
+    @PostMapping("/versionList")
+    @ResponseBody
+    public TableDataInfo versionList(SoftVersion softVersion) {
+        startPage();
+        List<SoftVersion> list = softVersionService.selectSoftVersion(softVersion);
+        return getDataTable(list);
+    }
+
+    /**
+     * 跳转修改APP版本页面
+     */
+    @GetMapping("/editVersion")
+    public String editVersion(Integer id, ModelMap mmap) {
+        SoftVersion softVersion = softVersionService.selectSoftVersionById(id);
+        mmap.put("softVersion",softVersion);
+        return prefix + "/editVersion";
+    }
+
+
+    /**
+     * 修改保存APP版本
+     */
+    @PostMapping("/updateVersion")
+    @ResponseBody
+    public AjaxResult updateVersion(SoftVersion softVersion) {
+        return toAjax(softVersionService.updateVersion(softVersion));
+    }
+
 }

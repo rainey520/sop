@@ -25,4 +25,18 @@
         </where>
     </select>
 
+    <!--通过id查询版本信息-->
+    <select id="selectSoftVersionById" parameterType="Integer" resultMap="SoftVersionResult">
+        <include refid="selectSoftVersionVo"/>
+        where id = #{id}
+    </select>
+
+    <update id="updateVersion" parameterType="com.ruoyi.project.app.domain.SoftVersion">
+        update tab_soft_version
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="version != null  and version != ''  ">version = #{version},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
 </mapper>

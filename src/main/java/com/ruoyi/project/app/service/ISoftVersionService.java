@@ -18,4 +18,18 @@ public interface ISoftVersionService {
      * @return 结果
      */
     List<SoftVersion> selectSoftVersion(SoftVersion softVersion);
+
+    /**
+     * 通过id查询版本信息
+     * @param id id
+     * @return 结果
+     */
+    SoftVersion selectSoftVersionById(Integer id);
+
+    /**
+     * 修改保存app版本
+     * @param softVersion 版本信息
+     * @return 结果
+     */
+    int updateVersion(SoftVersion softVersion);
 }
