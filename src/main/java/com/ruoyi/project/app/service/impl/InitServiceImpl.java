@@ -1,5 +1,6 @@
 package com.ruoyi.project.app.service.impl;
 
+import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.app.domain.Index;
@@ -8,6 +9,8 @@ import com.ruoyi.project.app.service.IInitService;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.iso.filesource.domain.FileSourceInfo;
 import com.ruoyi.project.iso.filesource.mapper.FileSourceInfoMapper;
+import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.system.menu.domain.Menu;
 import com.ruoyi.project.system.menu.mapper.MenuMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -33,6 +36,9 @@ public class InitServiceImpl implements IInitService {
 
     @Autowired
     private FileSourceInfoMapper fileInfoMapper;
+
+    @Autowired
+    private DevWorkOrderMapper workOrderMapper;
 
     /**
      * 获取当天工单、菜单权限、公司信息
@@ -71,5 +77,19 @@ public class InitServiceImpl implements IInitService {
     public List<Menu> initMenu(Index index) {
         User user = JwtUtil.getUser();
         return menuMapper.selectMenuListByParentIdAndUserId(user.getUserId().intValue(),index.getParentId());
+    }
+
+    /**
+     * 获取工单号
+     * @return 结果
+     */
+    @Override
+    public String getWorkCode() {
+        String workCode = CodeUtils.getWorkOrderCode();
+        DevWorkOrder workOrder = workOrderMapper.selectWorkOrderByCode(workCode);
+        if (workOrder != null) {
+            workCode = workCode + CodeUtils.getRandom();
+        }
+        return workCode;
     }
 }

@@ -6,12 +6,14 @@ import com.ruoyi.framework.shiro.service.LoginService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.app.domain.Index;
-import com.ruoyi.project.app.domain.Init;
 import com.ruoyi.project.app.service.IInitService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authc.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/app")
@@ -63,5 +65,13 @@ public class InitController extends BaseController {
         }catch (Exception e){
             return error(e.getMessage());
         }
+    }
+
+    /**
+     * 获取工单号的接口
+     */
+    @RequestMapping("/getWorkCode")
+    public AjaxResult getWorkCode(){
+        return AjaxResult.success(iInitService.getWorkCode());
     }
 }
