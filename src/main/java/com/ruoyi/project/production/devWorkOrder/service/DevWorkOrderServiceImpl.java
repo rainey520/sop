@@ -11,8 +11,6 @@ import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.Notification;
 import com.alibaba.fastjson.JSON;
 import com.baidu.aip.ocr.AipOcr;
-import com.ruoyi.common.constant.EcnConstants;
-import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
@@ -247,6 +245,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         workOrder.setProductName(product.getProductName());
         // 设置工单产品编码
         workOrder.setProductCode(product.getProductCode());
+        // 标准产量
+        workOrder.setProductStandardHour(product.getStandardHourYield());
         //产品型号
         workOrder.setProductModel(product.getProductModel());
         // 设置工单属于哪个公司
