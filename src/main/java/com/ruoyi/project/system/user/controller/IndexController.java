@@ -62,11 +62,15 @@ public class IndexController extends BaseController {
         List<Menu> menus = menuService.selectMenusByUser(user);
         DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
         user.setDevCompany(company);
-
         mmap.put("menus", menus);
         mmap.put("user",user);
         mmap.put("copyrightYear", ruoYiConfig.getCopyrightYear());
+        // 英文版
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return "index1";
+        }
         return "index";
+
     }
 
     // 系统介绍
@@ -95,7 +99,9 @@ public class IndexController extends BaseController {
             mmap.put("userTag",user.getLoginTag());
         }
         mmap.put("version", ruoYiConfig.getVersion());
-
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return "main1";
+        }
         return "main";
     }
 

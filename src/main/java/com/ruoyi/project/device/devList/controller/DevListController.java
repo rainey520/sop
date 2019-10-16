@@ -1,5 +1,6 @@
 package com.ruoyi.project.device.devList.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -43,7 +44,11 @@ public class DevListController extends BaseController
 	@GetMapping()
 	public String devList()
 	{
-	    return prefix + "/devList";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/devListEn";
+		}
+		return prefix + "/devList";
 	}
 	
 	/**
@@ -102,7 +107,11 @@ public class DevListController extends BaseController
 	{
 		DevList devList = devListService.selectDevListById(id);
 		mmap.put("devList", devList);
-	    return prefix + "/edit";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/editEn";
+		}
+		return prefix + "/edit";
 	}
 	
 	/**

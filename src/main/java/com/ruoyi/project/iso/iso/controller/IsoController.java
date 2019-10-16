@@ -1,6 +1,7 @@
 package com.ruoyi.project.iso.iso.controller;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
@@ -57,6 +58,10 @@ public class IsoController extends BaseController {
     public String iso(@PathVariable("id")int id,ModelMap mmap)
     {
         mmap.put("id",id);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/isoEn";
+        }
         return prefix + "/iso";
     }
 
@@ -169,6 +174,10 @@ public class IsoController extends BaseController {
     @GetMapping("/fileupload/{id}")
     public String upload(@PathVariable("id") Integer parentId, ModelMap mmap) {
         mmap.put("parentId", parentId);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/fileuploadEn";
+        }
         return prefix + "/fileupload";
     }
 

@@ -32,7 +32,7 @@
 				<a class="btn btn-success" onclick="add()" shiro:hasPermission="production:productionLine:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:productionLine:edit">
+				<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:productionLine:add">
 					<i class="fa fa-edit"></i> 修改
 				</a>
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:productionLine:export">
@@ -49,7 +49,7 @@
         var live = [[${@permission.hasPermi('production:productionLine:live')}]];
         var custom = [[${@permission.hasPermi('production:workstation:list')}]];
 		var asop = [[${@permission.hasPermi('iso:sopLine:add')}]];
-        var editFlag = [[${@permission.hasPermi('production:productionLine:edit')}]];
+        var editFlag = [[${@permission.hasPermi('production:productionLine:add')}]];
         var removeFlag = [[${@permission.hasPermi('production:productionLine:remove')}]];
         var prefix = ctx + "production/productionLine";
         $(function() {

@@ -125,7 +125,7 @@
     </select>
 
     <!--校验角色名称是否唯一-->
-    <select id="checkRoleNameUnique" parameterType="Map" resultMap="RoleResult">
+    <select id="checkRoleNameUnique" parameterType="Role" resultMap="RoleResult">
         <include refid="selectRoleVo"/>
         where r.role_name=#{roleName}
         <if test="companyId != null and companyId != ''">

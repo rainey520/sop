@@ -17,6 +17,7 @@ function login() {
 	$.modal.loading($("#btnSubmit").data("loading"));
 	var username = $.common.trim($("input[name='username']").val());
     var password = $.common.trim($("input[name='password']").val());
+    var languageVersion = $("input[name='languageVersion']:checked").val();
     var validateCode = $("input[name='validateCode']").val();
     var rememberMe = $("input[name='rememberme']").is(':checked');
     $.ajax({
@@ -26,6 +27,7 @@ function login() {
             "username": username,
             "password": password,
             "validateCode" : validateCode,
+            "languageVersion":languageVersion,
             "rememberMe": rememberMe
         },
         success: function(r) {

@@ -1,19 +1,19 @@
 package com.ruoyi.project.production.workstation.controller;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
-import org.apache.ibatis.annotations.Param;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,7 +50,11 @@ public class WorkstationController extends BaseController
 	public String workstation(@PathVariable("id") int id, ModelMap mmap)
 	{
 		mmap.put("line",id);
-	    return prefix + "/workstation";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/workstationEn";
+		}
+		return prefix + "/workstation";
 	}
 	
 	/**
@@ -110,7 +114,7 @@ public class WorkstationController extends BaseController
 	/**
 	 * 修改保存工位配置
 	 */
-	@RequiresPermissions("production:workstation:edit")
+	@RequiresPermissions("production:workstation:add")
 	@Log(title = "工位配置", businessType = BusinessType.UPDATE)
 	@PostMapping("/edit")
 	@ResponseBody
@@ -128,7 +132,7 @@ public class WorkstationController extends BaseController
 	/**
 	 * 删除工位配置
 	 */
-	@RequiresPermissions("production:workstation:remove")
+	@RequiresPermissions("production:workstation:add")
 	@Log(title = "工位配置", businessType = BusinessType.DELETE)
 	@PostMapping( "/remove")
 	@ResponseBody
@@ -153,6 +157,10 @@ public class WorkstationController extends BaseController
 	public String workstation2(@PathVariable("workid")int workid,ModelMap modelMap){
 		DevWorkOrder order = devWorkOrderService.selectDevWorkOrderById(workid);
 		modelMap.put("line",order.getLineId());
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/workstationEn";
+		}
 		return prefix + "/workstation";
 	}
 	

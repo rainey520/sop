@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * 登录校验方法
- * 
+ *
  * @author ruoyi
  */
 @Component
@@ -47,7 +47,7 @@ public class LoginService
     /**
      * 登录
      */
-    public AjaxResult login(String username, String password)
+    public AjaxResult login(String username, String password,Integer languageVersion)
     {
         // 验证码校验
         if (!StringUtils.isEmpty(ServletUtils.getRequest().getAttribute(ShiroConstants.CURRENT_CAPTCHA)))
@@ -93,13 +93,13 @@ public class LoginService
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.not.exists")));
             throw new UserNotExistsException();
         }
-        
+
         if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.delete")));
             throw new UserDeleteException();
         }
-        
+
         if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.blocked", user.getRemark())));
@@ -111,8 +111,12 @@ public class LoginService
         }
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-
-        Map<String,Object> map = new HashMap<>();
+        // 更新用户的语言版本
+        if (languageVersion != null) {
+            user.setLangVersion(languageVersion);
+            userService.updateUserLangVersion(user);
+        }
+        Map<String,Object> map = new HashMap<>(16);
         map.put(JwtUtil.CLAIM_KEY_USER, JSON.toJSONString(user));
         return AjaxResult.login(null,JwtUtil.getToken(map),1,username);
     }

@@ -200,11 +200,11 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int updateUser(User user) throws Exception {
+    public int updateUser(User user){
         User tokenUser = JwtUtil.getTokenUser(ServletUtils.getRequest());
         User u = userMapper.selectUserById(user.getUserId());
         if(!User.isAdmin(tokenUser) &&(User.isJty(u) || User.isAdmin(u))){
-            throw  new Exception("该用户是系统默认用户不能修改");
+            throw  new BusinessException("该用户是系统默认用户不能修改");
         }
         Long userId = user.getUserId();
 
@@ -619,5 +619,15 @@ public class UserServiceImpl implements IUserService {
             return user.getAvatar();
         }
         return null;
+    }
+
+    /**
+     * 更新用户语言版本
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public int updateUserLangVersion(User user) {
+        return userMapper.updateUserLangVersion(user);
     }
 }

@@ -86,7 +86,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUser(User user) throws Exception;
+    public int updateUser(User user);
 
     /**
      * 修改用户详细信息
@@ -208,4 +208,11 @@ public interface IUserService
      * @return
      */
     String selectUserInfo(Integer uid);
+
+    /**
+     * 更新用户语言版本
+     * @param user 用户信息
+     * @return 结果
+     */
+    int updateUserLangVersion(User user);
 }

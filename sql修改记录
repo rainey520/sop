@@ -56,4 +56,18 @@ ALTER TABLE `bzystandard`.`tab_soft_version`
 ADD COLUMN `tag` INT NULL COMMENT '类型(1、ASOP，2、生产看板，3、用户APP端)' AFTER `version`;
 
 
+# 2019-10-12 用户语言版本
+ALTER TABLE `bzystandard`.`sys_user`
+ADD COLUMN `lang_version` INT NULL DEFAULT 1 COMMENT '选择的语言版本，默认为1中文版，2为英文版' AFTER `sign`;
+
+# 2019-10-14 添加app本地化表
+CREATE TABLE `bzystandard`.`language` (
+  `info` TEXT NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'app本地化';
+
+
+
+
 

@@ -1,10 +1,10 @@
 package com.ruoyi.project.system.role.mapper;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ruoyi.project.system.role.domain.Role;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 角色表 数据层
@@ -79,10 +79,10 @@ public interface RoleMapper {
     /**
      * 校验角色名称是否唯一
      *
-     * @param mmap 角色名称和公司ID
+     * @param role 角色名称和公司ID
      * @return 角色信息
      */
-    public Role checkRoleNameUnique(Map mmap);
+    public Role checkRoleNameUnique(Role role);
 
     /**
      * 校验角色权限是否唯一

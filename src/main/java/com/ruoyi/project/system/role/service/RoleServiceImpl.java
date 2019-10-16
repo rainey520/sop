@@ -1,27 +1,26 @@
 package com.ruoyi.project.system.role.service;
 
-import java.util.*;
-
-import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.system.user.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.role.domain.Role;
 import com.ruoyi.project.system.role.domain.RoleDept;
 import com.ruoyi.project.system.role.domain.RoleMenu;
 import com.ruoyi.project.system.role.mapper.RoleDeptMapper;
 import com.ruoyi.project.system.role.mapper.RoleMapper;
 import com.ruoyi.project.system.role.mapper.RoleMenuMapper;
+import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserRoleMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * 角色 业务层处理
@@ -281,13 +280,12 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     public String checkRoleNameUnique(Role role,HttpServletRequest request) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        Map<String, Object> mmap = new HashMap<>();
-        mmap.put("roleName", role.getRoleName());
         User u = JwtUtil.getTokenUser(request);
-        if (!User.isAdmin(u)) {
-            mmap.put("companyId", u.getUserId());
+        if (u == null) {
+            return UserConstants.ROLE_NAME_NOT_UNIQUE;
         }
-        Role info = roleMapper.checkRoleNameUnique(mmap);
+        role.setCompanyId(u.getCompanyId().longValue());
+        Role info = roleMapper.checkRoleNameUnique(role);
         if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.ROLE_NAME_NOT_UNIQUE;
         }
@@ -305,7 +303,7 @@ public class RoleServiceImpl implements IRoleService {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         Integer companyId = null;
         User u = JwtUtil.getTokenUser(request);
-        if (!User.isAdmin(u)) { // 非系统用户
+        if (!User.isAdmin(u)) {
             companyId = u.getCompanyId();
         }
         Role info = roleMapper.checkRoleKeyUnique(role.getRoleKey(),companyId);

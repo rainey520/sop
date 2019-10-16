@@ -8,6 +8,7 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.app.domain.Index;
 import com.ruoyi.project.app.domain.SoftVersion;
 import com.ruoyi.project.app.service.IInitService;
+import com.ruoyi.project.app.service.ILanguageService;
 import com.ruoyi.project.app.service.ISoftVersionService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authc.AuthenticationException;
@@ -29,11 +30,14 @@ public class InitController extends BaseController {
     @Autowired
     private ISoftVersionService softVersionService;
 
+    @Autowired
+    private ILanguageService languageService;
+
     @PostMapping("/login")
     public AjaxResult ajaxLogin(@RequestBody User user) {
         try {
             System.out.println(user);
-            return loginService.login(user.getLoginName(),user.getPassword());
+            return loginService.login(user.getLoginName(),user.getPassword(),user.getLangVersion());
         } catch (AuthenticationException e) {
             String msg = "用户或密码错误";
             if (StringUtils.isNotEmpty(e.getMessage())) {
@@ -86,5 +90,14 @@ public class InitController extends BaseController {
     @RequestMapping("/version")
     public AjaxResult getSoftVersion(@RequestBody SoftVersion softVersion){
         return AjaxResult.success(softVersionService.selectSoftVersion(softVersion));
+    }
+
+    /**
+     * 查看app本地化
+     * @return 结果
+     */
+    @RequestMapping("/language")
+    public AjaxResult getSoftVersion(){
+        return AjaxResult.success(languageService.selectInfo());
     }
 }

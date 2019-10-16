@@ -32,10 +32,10 @@
 		</div>
 
 		<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-			<a class="btn btn-success" onclick="add()" shiro:hasPermission="production:productionLine:add">
+			<a class="btn btn-success" onclick="add()" shiro:hasPermission="production:workstation:add">
 				<i class="fa fa-plus"></i> 添加
 			</a>
-			<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:productionLine:edit">
+			<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:workstation:add">
 				<i class="fa fa-edit"></i> 修改
 			</a>
 			<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:productionLine:export">
@@ -54,8 +54,8 @@
 	});
 </script>
 <script th:inline="javascript">
-	var editFlag = [[${@permission.hasPermi('production:workstation:edit')}]];
-	var removeFlag = [[${@permission.hasPermi('production:workstation:remove')}]];
+	var editFlag = [[${@permission.hasPermi('production:workstation:add')}]];
+	var removeFlag = [[${@permission.hasPermi('production:workstation:add')}]];
 	var prefix = ctx + "production/workstation";
 
 	$(function() {

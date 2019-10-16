@@ -1,6 +1,7 @@
 package com.ruoyi.project.production.productionLine.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -47,6 +48,10 @@ public class ProductionLineController extends BaseController {
     @RequiresPermissions("production:productionLine:view")
     @GetMapping()
     public String productionLine() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/productionLineEn";
+        }
         return prefix + "/productionLine";
     }
 
@@ -80,6 +85,10 @@ public class ProductionLineController extends BaseController {
      */
     @GetMapping("/add")
     public String add() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/addEn";
+        }
         return prefix + "/add";
     }
 
@@ -91,7 +100,11 @@ public class ProductionLineController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult addSave(ProductionLine productionLine,HttpServletRequest request) {
-        return toAjax(productionLineService.insertProductionLine(productionLine,request));
+        try {
+            return toAjax(productionLineService.insertProductionLine(productionLine,request));
+        } catch (BusinessException e) {
+           return error(e.getMessage());
+        }
     }
 
     /**
@@ -101,13 +114,17 @@ public class ProductionLineController extends BaseController {
     public String edit(@PathVariable("id") Integer id, ModelMap mmap) {
         ProductionLine productionLine = productionLineService.selectProductionLineById(id);
         mmap.put("productionLine", productionLine);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/editEn";
+        }
         return prefix + "/edit";
     }
 
     /**
      * 修改保存生产线
      */
-    @RequiresPermissions("production:productionLine:edit")
+    @RequiresPermissions("production:productionLine:add")
     @Log(title = "生产线", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
@@ -282,11 +299,15 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     public AjaxResult appSelectLineWorkList(@RequestBody DevWorkOrder workOrder){
         try {
+            User user = JwtUtil.getUser();
+            if (user == null) {
+                return error("未登录或登录超时");
+            }
             if (workOrder != null) {
                 workOrder.appStartPage();
                 Map<String,Object> map = new HashMap<>(16);
-                if (workOrder != null && workOrder.getMenuList() != null && workOrder.getUid() != null) {
-                    map.put("menuList",menuService.selectMenuListByParentIdAndUserId(workOrder.getUid(),workOrder.getMenuList()));
+                if (workOrder != null && workOrder.getMenuList() != null) {
+                    map.put("menuList",menuService.selectMenuListByParentIdAndUserId(user.getUserId().intValue(),workOrder.getMenuList()));
                 }
                 map.put("workOrderList",workOrderService.selectDevWorkOrderList(workOrder));
                 return AjaxResult.success("请求成功",map);

@@ -1,25 +1,20 @@
 package com.ruoyi.project.iso.sopLine.controller;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.iso.sop.domain.Sop;
 import com.ruoyi.project.iso.sop.service.ISopService;
-import com.ruoyi.project.iso.sopLine.domain.SopLine;
-import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
-import com.ruoyi.project.production.singleWork.domain.SingleWork;
-import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -65,6 +60,10 @@ public class SopLineController extends BaseController {
     @GetMapping("/view/{id}")
     public String sopLine(@PathVariable("id") Integer isoId, ModelMap mmap) {
         mmap.put("isoId", isoId);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/sopLineEn";
+        }
         return prefix + "/sopLine";
     }
 
@@ -72,6 +71,10 @@ public class SopLineController extends BaseController {
     @GetMapping("/showDetail/{id}")
     public String showdetail(@PathVariable("id") Integer isoId, ModelMap mmap) {
         mmap.put("isoId", isoId);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/sopLineDetailEn";
+        }
         return prefix + "/sopLineDetail";
     }
 
@@ -97,6 +100,9 @@ public class SopLineController extends BaseController {
         modelMap.put("lineList", lineService.selectLineNotConfigByIsoId(isoId, user.getCompanyId()));
         modelMap.put("pages", iIsoService.selectIsoByParentId(isoId));
         modelMap.put("isoId", isoId);
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/addEn";
+        }
         return prefix + "/add";
     }
 
@@ -135,6 +141,10 @@ public class SopLineController extends BaseController {
         mmap.put("pages", iIsoService.selectIsoByParentId(sop.getSopId()));
         //查询所有工位配置信息
         mmap.put("sopLineWork", sopLineService.selectWorkstionBySId(sop.getId()));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/editEn";
+        }
         return prefix + "/edit";
     }
 
@@ -175,6 +185,10 @@ public class SopLineController extends BaseController {
         mmap.put("line", id);
         //查询所以的SOP 作业指导书
         mmap.put("sops", iIsoService.selectIsoByParentId(FileConstants.FOLDER_SOP));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/sopLineConfigEn";
+        }
         return prefix + "/sopLineConfig";
     }
 
@@ -192,6 +206,10 @@ public class SopLineController extends BaseController {
         //查询对应产线的所以工位信息
         mmap.put("work", workstationService.selectAllByLineId(lineId));
         mmap.put("line", lineId);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/add1En";
+        }
         return prefix + "/add1";
     }
 
@@ -218,6 +236,10 @@ public class SopLineController extends BaseController {
         mmap.put("pages", iIsoService.selectIsoByParentId(sop.getSopId()));
         //查询所有工位配置信息
         mmap.put("sopLineWork", sopLineService.selectWorkstionBySId(sop.getId()));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/edit1En";
+        }
         return prefix + "/edit1";
     }
 

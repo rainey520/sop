@@ -1,9 +1,8 @@
 package com.ruoyi.project.code.activeCode.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -36,6 +35,10 @@ public class MyActiveCodeController extends BaseController {
     @RequiresPermissions("code:myActiveCode:view")
     @GetMapping()
     public String activeCode() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/myActiveCodeEn";
+        }
         return prefix + "/myActiveCode";
     }
 
