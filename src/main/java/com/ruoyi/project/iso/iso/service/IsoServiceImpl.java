@@ -382,6 +382,7 @@ public class IsoServiceImpl implements IIsoService {
             map.put("msg", "硬件或激活码不能为空");
             return map;
         }
+        String toUpperWatchCode = apiActiveCode.getWatchCode().toUpperCase();
         ActiveCode uniqueActiveCode = activeCodeMapper.selctActiveCodeByCode(apiActiveCode.getCode());
         if (uniqueActiveCode == null) {
             map.put("code", 2);
@@ -389,22 +390,23 @@ public class IsoServiceImpl implements IIsoService {
             return map;
         }
 
-        DevList devList = devListMapper.selectDevListByCode(apiActiveCode.getWatchCode());
+        DevList devList = devListMapper.selectDevListByCode(toUpperWatchCode);
         if (devList == null || devList.getCompanyId() == null) {
             map.put("code", 0);
             map.put("msg", "硬件不存在或未归属公司");
             return map;
         }
         // 查询扫码硬件有没有绑定过
-        ActiveCode activeCodeByImei = activeCodeMapper.selectActiveCodeByImei(apiActiveCode.getWatchCode());
+        ActiveCode activeCodeByImei = activeCodeMapper.selectActiveCodeByImei(toUpperWatchCode);
         if (StringUtils.isNotNull(activeCodeByImei) && !apiActiveCode.getCode().equals(activeCodeByImei.getCode())) {
             map.put("code", 0);
             map.put("msg", "该硬件已被绑定");
             return map;
         }
         // 更新硬件绑定信息
-        uniqueActiveCode.setImei(apiActiveCode.getWatchCode());
+        uniqueActiveCode.setImei(toUpperWatchCode);
         uniqueActiveCode.setActSign(1);
+        uniqueActiveCode.setCompanyId(devList.getCompanyId());
         activeCodeMapper.updateActiveCode(uniqueActiveCode);
 
         if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
@@ -427,7 +429,7 @@ public class IsoServiceImpl implements IIsoService {
         // 设置作业指导书看板相关信息
         SopApi sopApi = new SopApi();
         //根据硬件编码查询对应的工位信息
-        Workstation workstation = workstationMapper.selectByDevCode(devList.getCompanyId(),apiActiveCode.getWatchCode());
+        Workstation workstation = workstationMapper.selectByDevCode(devList.getCompanyId(),toUpperWatchCode);
         if (workstation == null) {
             map.put("code", 0);
             map.put("msg", "工位不存在");

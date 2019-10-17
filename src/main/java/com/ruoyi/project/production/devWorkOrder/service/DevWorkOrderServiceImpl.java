@@ -50,10 +50,13 @@ import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
 import com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
+import com.ruoyi.project.system.config.mapper.JpushInfoMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,6 +77,11 @@ import java.util.*;
  */
 @Service("workOrder")
 public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
+
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DevWorkOrderServiceImpl.class);
 
     @Autowired
     private DevWorkOrderMapper devWorkOrderMapper;
@@ -211,6 +219,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         devWorkOrder.setProductName(devProductList.getProductName());
         // 设置工单产品编码
         devWorkOrder.setProductCode(devProductList.getProductCode());
+        devWorkOrder.setProductStandardHour(devProductList.getStandardHourYield());
         //产品型号
         devWorkOrder.setProductModel(devProductList.getProductModel());
         // 设置工单属于哪个公司
@@ -345,6 +354,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
+        // 查询公司
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if (company == null) {
+            throw new BusinessException("公司不存在或被删除");
+        }
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
 
         /**
@@ -399,7 +413,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             //将对应工单推送反馈状态修改为0
             devWorkOrderMapper.updateWorkOrderResSign(devWorkOrder.getId(), 0);
             workstationMapper.updateAllResSignByCompanyIdAndLineId(devWorkOrder.getCompanyId(), devWorkOrder.getLineId(), 0);
-            //流水线消息推送
+            //推送看板
+            JPushWatchMsg(company);
+            // 推送ASOP
             JPushMsg(1, devWorkOrder);
             // 通过产线id获取各个工位信息
             List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
@@ -458,6 +474,38 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Value("${jpush.appkey}")
     private String APP_KEY;
 
+    @Autowired
+    private JpushInfoMapper jpushInfoMapper;
+
+    /**
+     * 推送生产看板
+     * @param company
+     */
+    private void JPushWatchMsg(DevCompany company) {
+        List<String> alias = jpushInfoMapper.selectJPushInfoList(company.getLoginNumber());
+        JSONObject data = new JSONObject();
+        data.put("msg", "1");
+        //进行消息推送生产看板
+        JPushClient jpushClient = new JPushClient("d2a09226055d96209ef6a0a5", "641ae46722063ecb6673ad2e", null, ClientConfig.getInstance());
+        PushPayload payload = PushPayload.newBuilder()
+                .setPlatform(Platform.all())
+                .setAudience(Audience.alias(alias))
+                .setNotification(Notification.alert(data.toString()))
+                .build();
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+        } catch (APIConnectionException e) {
+            LOGGER.error("消息推送出现异常：" + e.getMessage());
+            // e.printStackTrace();
+        } catch (APIRequestException e) {
+            LOGGER.error("消息推送出现异常：" + e.getMessage());
+            // e.printStackTrace();
+        }
+    }
+
+    /**
+     * 推送ASOP
+     */
     private void JPushMsg(int type, DevWorkOrder order) {
         if (order == null)
             return;
@@ -505,6 +553,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if (company == null) {
+            throw new BusinessException("公司不存在或被删除");
+        }
         Long userId = user.getUserId();
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
@@ -520,6 +572,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         }
         devWorkOrderMapper.updateWorkOrderResSign(devWorkOrder.getId(), -1);
         workstationMapper.updateAllResSignByCompanyIdAndLineId(devWorkOrder.getCompanyId(), devWorkOrder.getLineId(), -1);
+        JPushWatchMsg(company);
         JPushMsg(1, devWorkOrder);
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
     }
