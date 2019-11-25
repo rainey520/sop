@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.UUID;
 
 public class TimeUtil {
     /***
@@ -42,25 +41,6 @@ public class TimeUtil {
         return c.get(Calendar.HOUR_OF_DAY);
     }
 
-    /**
-     * 获取时间与当前系统时间相差几个小时
-     *
-     * @param startDate 开始时间
-     * @return
-     */
-    public static float getDateDel(Date startDate) {
-        Date nowDate = new Date();
-        long nd = 1000 * 24 * 60 * 60;
-        long nh = 1000 * 60 * 60;
-        long nm = 1000 * 60;
-        long diff = nowDate.getTime() - startDate.getTime();
-        long day = diff / nd;
-        long hour = diff % nd / nh;
-        long min = diff % nd % nh / nm;
-        float m = (float) min / 60;
-        return hour + m;
-    }
-
     public static Date getSystemDate() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
@@ -81,6 +61,13 @@ public class TimeUtil {
         }
     }
 
+    /**
+     * 获取开始结束时间的小时数差值
+     *
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 结果
+     */
     public static float getDateDel(Date startDate, Date endDate) {
         long nd = 1000 * 24 * 60 * 60;
         long nh = 1000 * 60 * 60;
@@ -89,8 +76,9 @@ public class TimeUtil {
         long day = diff / nd;
         long hour = diff % nd / nh;
         long min = diff % nd % nh / nm;
+        float t = (float) day * 24;
         float m = (float) min / 60;
-        return hour + m;
+        return t + hour + m;
     }
 
     /**

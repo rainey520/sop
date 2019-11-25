@@ -53,7 +53,7 @@ public class DevList extends BaseEntity
 	private List<DevIo> devIos;
 
 	private Integer sign;//标记硬件是否配置 0、未配置 1、已经配置
-	/** 硬件配置对象车间或者流水线 0、车间，1、流水线 */
+	/** 硬件配置对象车间或者流水线 0、流水线，1、车间 */
 	private Integer devType;
 	/**
 	 * app端交互设备类型字段，硬件需要特别判断，其他情况该字段显示为devType
@@ -214,5 +214,29 @@ public class DevList extends BaseEntity
 
 	public void setSign(Integer sign) {
 		this.sign = sign;
+	}
+
+	@Override
+	public String toString() {
+		return "DevList{" +
+				"id=" + id +
+				", deviceId='" + deviceId + '\'' +
+				", devModel='" + devModel + '\'' +
+				", deviceStatus=" + deviceStatus +
+				", configStatus=" + configStatus +
+				", deviceName='" + deviceName + '\'' +
+				", devModelId=" + devModelId +
+				", deviceUploadTime=" + deviceUploadTime +
+				", companyId=" + companyId +
+				", comName='" + comName + '\'' +
+				", remark='" + remark + '\'' +
+				", defId=" + defId +
+				", configDate=" + configDate +
+				", createDate=" + createDate +
+				", devIos=" + devIos +
+				", sign=" + sign +
+				", devType=" + devType +
+				", deviceType='" + deviceType + '\'' +
+				'}';
 	}
 }

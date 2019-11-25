@@ -1,5 +1,6 @@
 package com.ruoyi.project.device.devList.controller;
 
+import com.ruoyi.common.constant.DevConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -60,6 +61,7 @@ public class DevListController extends BaseController
 	public TableDataInfo list(DevList devList,HttpServletRequest request)
 	{
 		startPage();
+		devList.setDevModelId(DevConstants.DEV_MODEL_KB);
         List<DevList> list = devListService.selectDevListList(devList,request);
 		return getDataTable(list);
 	}

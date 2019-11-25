@@ -1,12 +1,17 @@
 package com.ruoyi.project.app.service.impl;
 
+import com.ruoyi.common.constant.DevConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.spring.DevId;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.app.domain.Index;
 import com.ruoyi.project.app.domain.Init;
 import com.ruoyi.project.app.service.IInitService;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import com.ruoyi.project.device.devList.domain.DevList;
+import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.iso.filesource.domain.FileSourceInfo;
 import com.ruoyi.project.iso.filesource.mapper.FileSourceInfoMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -39,6 +45,9 @@ public class InitServiceImpl implements IInitService {
 
     @Autowired
     private DevWorkOrderMapper workOrderMapper;
+
+    @Autowired
+    private DevListMapper devListMapper;
 
     /**
      * 获取当天工单、菜单权限、公司信息
@@ -91,5 +100,29 @@ public class InitServiceImpl implements IInitService {
             workCode = workCode + CodeUtils.getRandom();
         }
         return workCode;
+    }
+
+    /**
+     * 获取看板编码
+     * @return 结果
+     */
+    @Override
+    public String getDevKbCode() {
+        // 创建计数器硬件编码
+        String kbCode = "KB" + DevId.getPageCode();
+        DevList dev = devListMapper.selectDevListByDevId(kbCode);
+        if (StringUtils.isNotNull(dev)) {
+            throw new BusinessException("生成看板硬件编码失败，请重新生成");
+        }
+        // 添加计数器硬件信息
+        dev = new DevList();
+        dev.setDeviceId(kbCode);
+        dev.setDeviceStatus(1);
+        dev.setDefId(0);
+        dev.setDeviceUploadTime(15);
+        dev.setDevModelId(DevConstants.DEV_MODEL_KB);
+        dev.setCreateDate(new Date());
+        devListMapper.insertDevList(dev);
+        return kbCode;
     }
 }

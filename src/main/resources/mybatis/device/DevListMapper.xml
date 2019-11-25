@@ -98,9 +98,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceId != null  and deviceId != ''  ">device_id = #{deviceId},</if>
             <if test="deviceStatus != null  ">device_status = #{deviceStatus},</if>
             <if test="configStatus != null  ">config_status = #{configStatus},</if>
+            <if test="sign != null  ">sign = #{sign},</if>
             device_name = #{deviceName},
             remark = #{remark},
             <if test="configDate != null  ">config_date = #{configDate},</if>
+            <if test="devType != null  ">dev_type = #{devType},</if>
         </trim>
         where id = #{id}
     </update>
@@ -181,14 +183,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDevNotConfig" resultMap="DevListResult">
         <include refid="selectDevListVo"/>
         <where>
-            and def_id = 0  and sign = 0 and device_status = 1
+            and def_id = 0  and sign = 0 and device_status = 1 and device_id like concat ('KB%')
             <if test="companyId != null and companyId > 0"> and company_id = #{companyId}</if>
         </where>
     </select>
 
     <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
     <update id="updateDevSignAndType1">
-        update dev_list set sign = #{sign},dev_type = #{devType},device_name=#{deviceName} where id = #{id} and company_id = #{companyId}
+        update dev_list set company_id = #{companyId}, sign = #{sign},dev_type = #{devType},device_name= #{deviceName} where id = #{id}
     </update>
 
     <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
@@ -203,6 +205,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过硬件编号查询未被删除的硬件信息-->
     <select id="selectDevListByComCode" resultMap="DevListResult1">
-         SELECT * FROM dev_list where device_id = #{code} and company_id = #{companyId} and def_id = 0 limit 1;
+         SELECT * FROM dev_list where device_id = #{code} and def_id = 0 limit 1;
     </select>
 </mapper>

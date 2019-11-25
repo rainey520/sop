@@ -1,6 +1,7 @@
 package com.ruoyi.project.monitor.job.task;
 
 import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.project.monitor.job.service.IJobService;
 import com.ruoyi.project.production.devWorkDayHour.service.IDevWorkDayHourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,12 @@ import org.springframework.stereotype.Component;
  */
 @Component("ryTask")
 public class RyTask extends BaseController {
+
+    @Autowired
+    private IDevWorkDayHourService workDayHourService;
+
+    @Autowired
+    private IJobService jobService;
 
 
     public void ryParams(String params) {
@@ -27,5 +34,19 @@ public class RyTask extends BaseController {
      */
     public void calcDataLog() {
 
+    }
+
+    /**
+     * 删除两个月都未登录的极光推送列表
+     */
+    public void deleteInvalidTime(){
+        jobService.deleteInvalidTime();
+    }
+
+    /**
+     * 计算工单24小时记录
+     */
+    public void countWorkHourNum(){
+        workDayHourService.selectCalcDataLog();
     }
 }

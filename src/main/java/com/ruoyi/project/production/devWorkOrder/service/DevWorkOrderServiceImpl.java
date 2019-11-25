@@ -42,8 +42,6 @@ import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
-import com.ruoyi.project.production.workData.domain.WorkData;
-import com.ruoyi.project.production.workData.mapper.WorkDataMapper;
 import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
 import com.ruoyi.project.production.workDayHour.mapper.WorkDayHourMapper;
 import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
@@ -93,10 +91,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     private UserMapper userMapper;
 
     @Autowired
-    private ProductionLineMapper productionLineMapper; // 产线
+    private ProductionLineMapper productionLineMapper;
 
     @Autowired
-    private DevProductListMapper productListMapper; // 产品
+    private DevProductListMapper productListMapper;
 
     @Autowired
     private WorkOrderChangeMapper orderChangeMapper;
@@ -104,12 +102,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private EcnLogMapper ecnLogMapper;
 
-
     @Autowired
     private WorkstationMapper workstationMapper;
-
-    @Autowired
-    private WorkDataMapper workDataMapper;
 
     @Autowired
     private WorkDayHourMapper workDayHourMapper;
@@ -344,13 +338,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int editWorkerOrderById(Integer id, Integer uid) {
-        User user = null;
-        if (uid == null) {
-            user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        } else {
-            user = userMapper.selectUserInfoById(uid);
-        }
+    public int editWorkerOrderById(Integer id) {
+        User user = JwtUtil.getUser();
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
@@ -364,8 +353,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         /**
          * 流水线
          */
-//        if (devWorkOrder.getWlSign().equals(WorkConstants.SING_LINE)) {
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
+        if (productionLine == null) {
+            throw new BusinessException("产线不存在或被删除");
+        }
         // 不是工单负责人
         if (productionLine.getDeviceLiable() != user.getUserId().intValue() &&
                 productionLine.getDeviceLiableTow() != user.getUserId().intValue() &&
@@ -419,12 +410,12 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             JPushMsg(1, devWorkOrder);
             // 通过产线id获取各个工位信息
             List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
-            WorkData workData = null;
+            DevWorkData workData = null;
             WorkDayHour workDayHour = null;
             if (StringUtils.isNotEmpty(workstationList)) {
                 for (Workstation workstation : workstationList) {
                     // 初始化工单数据
-                    workData = new WorkData();
+                    workData = new DevWorkData();
                     workData.setWorkId(devWorkOrder.getId());
                     workData.setCompanyId(devWorkOrder.getCompanyId());
                     workData.setLineId(devWorkOrder.getLineId());
@@ -435,7 +426,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     // 设置工位
                     workData.setIoId(workstation.getId());
                     workData.setCreateTime(new Date());
-                    workDataMapper.insertWorkData(workData);
+                    workData.setIoSign(workstation.getSign());
+                    devWorkDataMapper.insertDevWorkData(workData);
 
                     // 初始化工单各个IO口每小时数据
                     workDayHour = new WorkDayHour();

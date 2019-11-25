@@ -1,5 +1,6 @@
 package com.ruoyi.project.app.controller;
 
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.exception.base.BaseException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.shiro.service.LoginService;
@@ -99,5 +100,17 @@ public class InitController extends BaseController {
     @RequestMapping("/language")
     public AjaxResult getSoftVersion(){
         return AjaxResult.success(languageService.selectInfo());
+    }
+
+    /**
+     * 获取看板硬件编码信息
+     */
+    @RequestMapping("/getDevKbCode")
+    public AjaxResult getDevKbCode(){
+        try {
+            return AjaxResult.success(iInitService.getDevKbCode());
+        } catch (BusinessException e) {
+            return AjaxResult.error(e.getMessage());
+        }
     }
 }

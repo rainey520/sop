@@ -170,4 +170,11 @@ public interface WorkstationMapper
 	 * @return
 	 */
 	List<Workstation> selectAllCodeNotNullByLineId(@Param("companyId")int companyId,@Param("lineId")int lineId);
+
+	/**
+	 * 修改工位配置信息
+	 * @param workstation 工位信息
+	 * @return 结果
+	 */
+	int updateWorkstationInfo(Workstation workstation);
 }

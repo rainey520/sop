@@ -37,4 +37,17 @@ public class DevConstants {
      */
     public static final int DEV_STATUS_NO = 0;
     public static final int DEV_STATUS_YES = 1;
+    /**
+     * 硬件类型 </br>
+     *  1、看板硬件KB开头  2、计数器硬件JS开头
+     */
+    public static final Integer DEV_MODEL_KB = 1;
+    public static final Integer DEV_MODEL_JS = 2;
+
+    /**
+     * 看板硬件工位配置确认标记常量 </br>
+     *  1、确认更新配置  0、未确认
+     */
+    public static final Integer DEV_CONFIRMTAG_YES = 1;
+    public static final Integer DEV_CONFIRMTAG_NO = 0;
 }

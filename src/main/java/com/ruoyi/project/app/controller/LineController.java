@@ -4,6 +4,7 @@ import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.app.domain.LineData;
 import com.ruoyi.project.app.service.ILineService;
 import com.ruoyi.project.code.activeCode.service.IActiveCodeService;
 import com.ruoyi.project.iso.iso.domain.Iso;
@@ -208,5 +209,13 @@ public class LineController {
             return AjaxResult.error(e.getMessage());
         }
         return AjaxResult.error();
+    }
+
+    /**
+     * 产线工位关联配置
+     */
+    @RequestMapping("/lineConfigKbCode")
+    public Map<String,Object> lineConfigKbCode(@RequestBody LineData lineData){
+        return lineService.lineConfigKbCode(lineData);
     }
 }

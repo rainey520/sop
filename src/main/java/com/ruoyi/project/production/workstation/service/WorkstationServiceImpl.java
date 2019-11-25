@@ -216,7 +216,7 @@ public class WorkstationServiceImpl implements IWorkstationService
 		    throw new BusinessException("看板硬件不能为空");
 		}
 		// 查询扫码的硬件是否存在
-		DevList devList = devListMapper.selectDevListByComCode(user.getCompanyId(), workstation.getcCode());
+		DevList devList = devListMapper.selectDevListByComCode(workstation.getcCode());
 		if (devList == null) {
 			throw new BusinessException("硬件不存在或被删除");
 		}

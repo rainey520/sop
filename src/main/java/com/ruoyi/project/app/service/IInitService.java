@@ -25,4 +25,10 @@ public interface IInitService {
      * @return 工单号
      */
     String getWorkCode();
+
+    /**
+     * 获取看板编码
+     * @return 看板编码
+     */
+    String getDevKbCode();
 }
